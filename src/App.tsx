@@ -86,7 +86,7 @@ function App() {
   }
 
   const load = () => {
-    if (!LOAD || !LOAD.files ) return;
+    if (!LOAD || !LOAD.files) return;
     const file = LOAD.files[0];
     if (!file) return;
 
@@ -189,6 +189,7 @@ function App() {
   // Play not from given note and volume
   // Volume default value set for PC play
   const play = (note: string | number, volume: number, duration: number | undefined) => {
+    if (!DISPLAY) return;
     const key = document.querySelector(`#key${note}`);
     const tone = inputToNote(+note);
     DISPLAY.innerText = note + ' - ' + tone;
@@ -270,7 +271,7 @@ function App() {
     })
   }
 
-  const add = () => {}
+  const add = () => { }
 
   const handleClose = () => { }
 
@@ -317,16 +318,17 @@ function App() {
       <main>
         <h3 className="title" id="display">Input - Note</h3>
         <ul className="keyboard" id="keyboard">
-          {Array.from('108').fill('').map((note, i) => {
+          {new Array(108).fill('').map((note, i) =>
             <li
               className="keyboard__note"
-              id="i"
+              id={`${i}`}
+              key={i}
               onMouseDown={() => play(i, 50, undefined)}
               onMouseOut={() => play(i, 0, undefined)}
               onTouchStart={() => play(i, 50, undefined)}
               onTouchEnd={() => play(1, 0, undefined)}
             >{i}</li>
-          })}
+          )}
         </ul>
 
         <h3 className="title" id="key"></h3>
