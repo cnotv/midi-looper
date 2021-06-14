@@ -1,18 +1,18 @@
-import React from 'react';
+import { Midi } from '@tonejs/midi';
 import * as Tone from 'tone';
-import * as WebMidi from 'webmidi';
-import logo from './logo.svg';
-// import './App.scss';
+import WebMidi, { InputEventNoteoff, InputEventNoteon } from 'webmidi';
+
+import './App.scss';
 
 function App() {
-  const DISPLAY = document.querySelector('#display');
-  const INFO = document.querySelector('#info');
-  const PLAYED = document.querySelector('#played');
-  // const KEYBOARD = document.querySelector('#keyboard');
-  const KEY = document.querySelector('#key');
-  const LOAD = document.querySelector('#load');
-  const SAVE = document.querySelector('#save');
-  const LOAD_LABEL = document.querySelector('#loadLabel');
+  const DISPLAY = document.querySelector('#display') as HTMLElement;
+  const INFO = document.querySelector('#info') as HTMLElement;
+  const PLAYED = document.querySelector('#played') as HTMLElement;
+  // const KEYBOARD = document.querySelector('#keyboard') as HTMLElement;
+  const KEY = document.querySelector('#key') as HTMLElement;
+  const LOAD = document.querySelector('#load') as HTMLInputElement;
+  const SAVE = document.querySelector('#save') as HTMLElement;
+  const LOAD_LABEL = document.querySelector('#loadLabel') as HTMLElement;
 
   const DEFAULT_FILE_NAME = 'my-midi';
   const CLASS = 'keyboard__note--pressed';
@@ -23,34 +23,36 @@ function App() {
 
   // Allow to store the current note in an index, for duration computation
   const CURRENT = {};
-  const RECORDED = [];
+  const RECORDED: { time: any; volume: any; note: any, duration: any }[] = [];
 
   let isRecording = false;
   let isLoop = false;
   let recordingTime = 0;
-  let theLoop;
+  let theLoop: NodeJS.Timeout;
   let octave = 4;
-  let output;
+  let output: { stopNote: (arg0: string) => void; playNote: (arg0: string) => void; };
 
   // Listen external Midi IO
   const listenWebMidi = () => {
-    WebMidi.enable(function (err) {
+    WebMidi.enable(function (err: any) {
       // Get the first real device
-      input = WebMidi.inputs.filter(input => !!input.manufacturer)[0];
-      output = WebMidi.outputs.filter(output => !!output.manufacturer)[0];
+      let input = WebMidi.inputs.filter((input: { manufacturer: any; }) => !!input.manufacturer)[0];
+      output = WebMidi.outputs.filter((output: { manufacturer: any; }) => !!output.manufacturer)[0];
 
-      if (input) {
-        const { version, manufacturer, name } = input;
-        INFO.innerText = [version, manufacturer, name].join(' - ');
+      if (input && INFO?.innerText) {
+        // const { version, manufacturer, name } = input;
+        // INFO.innerText = [version, manufacturer, name].join(' - ');
+        const { manufacturer, name } = input;
+        INFO.innerText = [manufacturer, name].join(' - ');
 
         // TODO: Create a map to retrieve length of playing time
-        input.addListener('noteon', 'all', (event) => {
+        input.addListener('noteon', 'all', (event: InputEventNoteon) => {
           const [something, note, volume] = event.data;
-          play(note, volume)
+          play(note, volume, undefined)
         })
-        input.addListener('noteoff', 'all', (event) => {
+        input.addListener('noteoff', 'all', (event: InputEventNoteoff) => {
           const [something, note, volume] = event.data;
-          play(note, 0)
+          play(note, 0, undefined)
         })
       }
     })
@@ -67,7 +69,7 @@ function App() {
       if (pos >= 0 && !repeat) {
         const note = pos + offset + octave * 8;
         KEY.innerText = key;
-        play(note);
+        play(note, 50, undefined);
       }
     })
 
@@ -78,12 +80,13 @@ function App() {
 
       if (pos >= 0) {
         const note = pos + offset + octave * 8;
-        play(note, 0);
+        play(note, 0, undefined);
       }
     });
   }
 
   const load = () => {
+    if (!LOAD || !LOAD.files ) return;
     const file = LOAD.files[0];
     if (!file) return;
 
@@ -91,13 +94,14 @@ function App() {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const midi = new Midi(e.target.result);
+      if (!e || !e.target || !e.target.result) return;
+      const midi = new Midi(e.target.result as ArrayBuffer);
       // TODO: Replace when allow multiple loops
       const piano = midi.tracks
-        .filter(track => ['piano', 'guitar'].includes(track.instrument.family))
-        .filter(track => track.notes.length)[0];
-      // TODO: Replace after refactorying note object to match tone.js
-      const notes = piano.notes.map(n => {
+        .filter((track: { instrument: { family: string; }; }) => ['piano', 'guitar'].includes(track.instrument.family))
+        .filter((track: { notes: string | any[]; }) => track.notes.length)[0];
+      // TODO: Replace after refactoring note object to match tone.js
+      const notes = piano.notes.map((n: { midi: any; velocity: number; ticks: any; duration: any; }) => {
         return {
           note: n.midi,
           volume: n.velocity * 100,
@@ -119,6 +123,7 @@ function App() {
 
   // Listen input file for midi loading
   const listenLoad = () => {
+    if (!LOAD) return;
     LOAD.onchange = load;
   }
 
@@ -155,6 +160,7 @@ function App() {
   }
 
   const listenSave = () => {
+    if (!SAVE) return;
     SAVE.onclick = save;
   }
 
@@ -168,7 +174,7 @@ function App() {
   }
 
   // Map Inpput value to actual note
-  const inputToNote = (input) => {
+  const inputToNote = (input: number) => {
     // TODO: Verify why 4
     const offset = 4;
     const inputOffset = input - offset;
@@ -182,9 +188,9 @@ function App() {
 
   // Play not from given note and volume
   // Volume default value set for PC play
-  const play = (note, volume = 50, duration) => {
+  const play = (note: string | number, volume: number, duration: number | undefined) => {
     const key = document.querySelector(`#key${note}`);
-    const tone = inputToNote(note);
+    const tone = inputToNote(+note);
     DISPLAY.innerText = note + ' - ' + tone;
 
     // if (!CURRENT[note]) {
@@ -224,14 +230,14 @@ function App() {
       // Add length
       RECORDED.push({ note, volume, time, duration })
       PLAYED.innerText = RECORDED
-        .filter(note => !!note.volume)
-        .map(note => inputToNote(note.note))
+        .filter(x => !!x.volume)
+        .map(x => inputToNote(x.note))
         .join(', ');
     }
   }
 
   // Start recording
-  const record = (status) => {
+  const record = (status: boolean) => {
     isRecording = status;
     recordingTime = performance.now();
   };
@@ -263,6 +269,8 @@ function App() {
       }, note.time);
     })
   }
+
+  const add = () => {}
 
   const handleClose = () => { }
 
@@ -313,10 +321,10 @@ function App() {
             <li
               className="keyboard__note"
               id="i"
-              onMouseDown={() => play(i)}
-              onMouseOut={() => play(i, 0)}
-              onTouchStart={() => play(i)}
-              onTouchEnd={() => play(1, 0)}
+              onMouseDown={() => play(i, 50, undefined)}
+              onMouseOut={() => play(i, 0, undefined)}
+              onTouchStart={() => play(i, 50, undefined)}
+              onTouchEnd={() => play(1, 0, undefined)}
             >{i}</li>
           })}
         </ul>
