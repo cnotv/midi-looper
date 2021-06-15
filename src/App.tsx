@@ -2,17 +2,23 @@ import { Midi } from '@tonejs/midi';
 import * as Tone from 'tone';
 import WebMidi, { InputEventNoteoff, InputEventNoteon } from 'webmidi';
 
+import { ReactComponent as IconAdd } from './assets/img/add.svg';
+
 import './App.scss';
+import { Keyboard } from './components/Keyboard';
+import { Track } from './components/Track';
+import { Loader } from './components/Loader';
+import { useState } from 'react';
 
 function App() {
-  const DISPLAY = document.querySelector('#display') as HTMLElement;
-  const INFO = document.querySelector('#info') as HTMLElement;
-  const PLAYED = document.querySelector('#played') as HTMLElement;
+  const [display, setDisplay] = useState('Input - Note');
+  const [info, setInfo] = useState('No recognized devices. Plug in your MIDI controller to play, otherwise use the virtual piano or your keyboards');
+  const [played, setPlayed] = useState('');
+  const [currentKey, setCurrentKey] = useState('');
+  const [loadLabel, setLoadLabel] = useState('Load midi');
+
   // const KEYBOARD = document.querySelector('#keyboard') as HTMLElement;
-  const KEY = document.querySelector('#key') as HTMLElement;
   const LOAD = document.querySelector('#load') as HTMLInputElement;
-  const SAVE = document.querySelector('#save') as HTMLElement;
-  const LOAD_LABEL = document.querySelector('#loadLabel') as HTMLElement;
 
   const DEFAULT_FILE_NAME = 'my-midi';
   const CLASS = 'keyboard__note--pressed';
@@ -39,11 +45,11 @@ function App() {
       let input = WebMidi.inputs.filter((input: { manufacturer: any; }) => !!input.manufacturer)[0];
       output = WebMidi.outputs.filter((output: { manufacturer: any; }) => !!output.manufacturer)[0];
 
-      if (input && INFO?.innerText) {
+      if (input && info) {
         // const { version, manufacturer, name } = input;
         // INFO.innerText = [version, manufacturer, name].join(' - ');
         const { manufacturer, name } = input;
-        INFO.innerText = [manufacturer, name].join(' - ');
+        setInfo([manufacturer, name].join(' - '));
 
         // TODO: Create a map to retrieve length of playing time
         input.addListener('noteon', 'all', (event: InputEventNoteon) => {
@@ -68,7 +74,7 @@ function App() {
       const pos = KEYMAP.indexOf(key);
       if (pos >= 0 && !repeat) {
         const note = pos + offset + octave * 8;
-        KEY.innerText = key;
+        setCurrentKey(key);
         play(note, 50, undefined);
       }
     })
@@ -90,7 +96,7 @@ function App() {
     const file = LOAD.files[0];
     if (!file) return;
 
-    LOAD_LABEL.textContent = file.name;
+    setLoadLabel(file.name);
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -113,10 +119,10 @@ function App() {
       RECORDED.length = 0;
       RECORDED.push(...notes);
       console.log(JSON.stringify(notes))
-      PLAYED.innerText = RECORDED
+      setPlayed(RECORDED
         .filter(note => !!note.volume)
         .map(note => inputToNote(note.note))
-        .join(', ');
+        .join(', '));
     };
     reader.readAsArrayBuffer(file);
   };
@@ -127,7 +133,7 @@ function App() {
     LOAD.onchange = load;
   }
 
-  const save = () => {
+  const handleSave = () => {
     const midi = new Midi()
     const track = midi.addTrack()
     RECORDED.forEach(
@@ -159,16 +165,11 @@ function App() {
     document.body.removeChild(elem);
   }
 
-  const listenSave = () => {
-    if (!SAVE) return;
-    SAVE.onclick = save;
-  }
-
   // Reset everything
   const reset = () => {
     RECORDED.length = 0;
-    PLAYED.innerText = '';
-    DISPLAY.innerText = '';
+    setPlayed('');
+    setDisplay('');
     isRecording = false;
     isLoop = false;
   }
@@ -189,10 +190,10 @@ function App() {
   // Play not from given note and volume
   // Volume default value set for PC play
   const play = (note: string | number, volume: number, duration: number | undefined) => {
-    if (!DISPLAY) return;
+    if (!display) return;
     const key = document.querySelector(`#key${note}`);
     const tone = inputToNote(+note);
-    DISPLAY.innerText = note + ' - ' + tone;
+    setDisplay(note + ' - ' + tone);
 
     // if (!CURRENT[note]) {
     //   CURRENT[note] = performance.now();
@@ -230,10 +231,10 @@ function App() {
       const time = Math.floor(performance.now() - recordingTime);
       // Add length
       RECORDED.push({ note, volume, time, duration })
-      PLAYED.innerText = RECORDED
+      setPlayed(RECORDED
         .filter(x => !!x.volume)
         .map(x => inputToNote(x.note))
-        .join(', ');
+        .join(', '));
     }
   }
 
@@ -244,7 +245,7 @@ function App() {
   };
 
   // Start loop
-  const loop = () => {
+  const handleLoop = () => {
     isLoop = !isLoop;
     isRecording = false;
     if (RECORDED.length) {
@@ -279,101 +280,37 @@ function App() {
   listenWebMidi();
   listenKeyboard();
   listenLoad();
-  listenSave();
-
-
 
   return (
     <div className="App">
       <header className="description">
-        <p>
-          <span>Info:</span>
-          <span id="info">No recognized devices. Plug in your MIDI controller to play, otherwise use the virtual piano or your keyboards</span>
-        </p>
-
-        <input
-          className="load"
-          id="load"
-          type="file"
-          name="load"
-          accept="mid"
+        <Loader
+          label={loadLabel}
+          info={info}
+          save={handleSave}
         />
-        <label
-          htmlFor="load"
-          id="loadLabel"
-        >
-          <span>Load midi</span>
-          <svg viewBox="64 64 896 896" focusable="false" data-icon="upload" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-            <path d="M400 317.7h73.9V656c0 4.4 3.6 8 8 8h60c4.4 0 8-3.6 8-8V317.7H624c6.7 0 10.4-7.7 6.3-12.9L518.3 163a8 8 0 00-12.6 0l-112 141.7c-4.1 5.3-.4 13 6.3 13zM878 626h-60c-4.4 0-8 3.6-8 8v154H214V634c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v198c0 17.7 14.3 32 32 32h684c17.7 0 32-14.3 32-32V634c0-4.4-3.6-8-8-8z"></path>
-          </svg>
-        </label>
-
-        <button id="save">
-          <svg viewBox="64 64 896 896" focusable="false" data-icon="save" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-            <path d="M893.3 293.3L730.7 130.7c-7.5-7.5-16.7-13-26.7-16V112H144c-17.7 0-32 14.3-32 32v736c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V338.5c0-17-6.7-33.2-18.7-45.2zM384 184h256v104H384V184zm456 656H184V184h136v136c0 17.7 14.3 32 32 32h320c17.7 0 32-14.3 32-32V205.8l136 136V840zM512 442c-79.5 0-144 64.5-144 144s64.5 144 144 144 144-64.5 144-144-64.5-144-144-144zm0 224c-44.2 0-80-35.8-80-80s35.8-80 80-80 80 35.8 80 80-35.8 80-80 80z"></path>
-          </svg>
-        </button>
       </header>
 
       <main>
-        <h3 className="title" id="display">Input - Note</h3>
-        <ul className="keyboard" id="keyboard">
-          {new Array(108).fill('').map((note, i) =>
-            <li
-              className="keyboard__note"
-              id={`${i}`}
-              key={i}
-              onMouseDown={() => play(i, 50, undefined)}
-              onMouseOut={() => play(i, 0, undefined)}
-              onTouchStart={() => play(i, 50, undefined)}
-              onTouchEnd={() => play(1, 0, undefined)}
-            >{i}</li>
-          )}
-        </ul>
+        <h3 className="title">{display}</h3>
+        <Keyboard
+          play={play}
+        />
 
-        <h3 className="title" id="key"></h3>
+        <h3 className="title">{currentKey}</h3>
         <h3 className="title">Tracks</h3>
-        <section className="loops">
-          <h1>#1</h1>
-          <p id="played"></p>
-          <div className="loops__actions">
-            <button onClick={() => record(true)}>
-              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="30" fill="red"></circle>
-              </svg>
-            </button>
-            <button onClick={() => record(false)}>
-              <svg viewBox="64 64 896 896" focusable="false" data-icon="pause" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-                <path d="M304 176h80v672h-80zm408 0h-64c-4.4 0-8 3.6-8 8v656c0 4.4 3.6 8 8 8h64c4.4 0 8-3.6 8-8V184c0-4.4-3.6-8-8-8z"></path>
-              </svg>
-            </button>
-            <button onClick={() => loop()}>
-              <svg viewBox="64 64 896 896" focusable="false" data-icon="sync" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-                <path d="M168 504.2c1-43.7 10-86.1 26.9-126 17.3-41 42.1-77.7 73.7-109.4S337 212.3 378 195c42.4-17.9 87.4-27 133.9-27s91.5 9.1 133.8 27A341.5 341.5 0 01755 268.8c9.9 9.9 19.2 20.4 27.8 31.4l-60.2 47a8 8 0 003 14.1l175.7 43c5 1.2 9.9-2.6 9.9-7.7l.8-180.9c0-6.7-7.7-10.5-12.9-6.3l-56.4 44.1C765.8 155.1 646.2 92 511.8 92 282.7 92 96.3 275.6 92 503.8a8 8 0 008 8.2h60c4.4 0 7.9-3.5 8-7.8zm756 7.8h-60c-4.4 0-7.9 3.5-8 7.8-1 43.7-10 86.1-26.9 126-17.3 41-42.1 77.8-73.7 109.4A342.45 342.45 0 01512.1 856a342.24 342.24 0 01-243.2-100.8c-9.9-9.9-19.2-20.4-27.8-31.4l60.2-47a8 8 0 00-3-14.1l-175.7-43c-5-1.2-9.9 2.6-9.9 7.7l-.7 181c0 6.7 7.7 10.5 12.9 6.3l56.4-44.1C258.2 868.9 377.8 932 512.2 932c229.2 0 415.5-183.7 419.8-411.8a8 8 0 00-8-8.2z"></path>
-              </svg>
-            </button>
-            <button onClick={() => reset()}>
-              <svg viewBox="64 64 896 896" focusable="false" data-icon="delete" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-                <path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z"></path>
-              </svg>
-            </button>
-          </div>
-          <button className="close" onClick={() => handleClose()}>
-            <svg viewBox="64 64 896 896" focusable="false" data-icon="close" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-              <path d="M563.8 512l262.5-312.9c4.4-5.2.7-13.1-6.1-13.1h-79.8c-4.7 0-9.2 2.1-12.3 5.7L511.6 449.8 295.1 191.7c-3-3.6-7.5-5.7-12.3-5.7H203c-6.8 0-10.5 7.9-6.1 13.1L459.4 512 196.9 824.9A7.95 7.95 0 00203 838h79.8c4.7 0 9.2-2.1 12.3-5.7l216.5-258.1 216.5 258.1c3 3.6 7.5 5.7 12.3 5.7h79.8c6.8 0 10.5-7.9 6.1-13.1L563.8 512z"></path>
-            </svg>
-          </button>
+        <section className="tracks">
+          <Track
+            played={played}
+            record={record}
+            loop={handleLoop}
+            reset={reset}
+          />
         </section>
       </main>
       <div className="add">
         <button onClick={() => add()}>
-          <svg viewBox="64 64 896 896" focusable="false" data-icon="plus" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-            <defs>
-              <style></style>
-            </defs>
-            <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z"></path>
-            <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z"></path>
-          </svg>
+          <IconAdd />
         </button>
       </div>
       <footer className="info"></footer>

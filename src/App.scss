@@ -1,13 +1,10 @@
+@import './assets/styles/global/variables.scss';
 @import url(https://fonts.googleapis.com/css?family=Lato);
-$note-width: 20px;
-$note-gap: 2px;
-$button-size: 2em;
-$color-primary: black;
-$color-secondary: ivory;
-$color-accent: orange;
 
 body, html {
   height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -85,19 +82,6 @@ body {
       background-color: $color-accent;
     }
   }
-}
-
-.loops {
-  position: relative;
-  border: 1px solid $color-primary;
-  flex-direction: column;
-  // width: 200px;
-  padding: 1em;
-  margin: 0.5em;
-  border-radius: 0.2em;
-  box-shadow: 0.2em 0.2em 0 0 $color-primary;
-  
-  &__actions {}
 }
 
 button {
