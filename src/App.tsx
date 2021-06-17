@@ -28,7 +28,7 @@ function App() {
   const NOW = Tone.now();
 
   // Allow to store the current note in an index, for duration computation
-  const CURRENT = {};
+  const CURRENT: Record<string, number> = {};
   const RECORDED: { time: any; volume: any; note: any, duration: any }[] = [];
 
   let isRecording = false;
@@ -153,16 +153,19 @@ function App() {
     //   })
 
     const saveAs = prompt('Save midi file as:', DEFAULT_FILE_NAME);
-    const fileName = `${saveAs || DEFAULT_FILE_NAME}.mid`;
-    const data = midi.toArray();
-    const blob = new Blob([data], { type: 'audio/midi audio/x-midi' });
 
-    const elem = window.document.createElement('a');
-    elem.href = window.URL.createObjectURL(blob);
-    elem.download = fileName;
-    document.body.appendChild(elem);
-    elem.click();
-    document.body.removeChild(elem);
+    if (saveAs) {
+      const fileName = `${saveAs}.mid`;
+      const data = midi.toArray();
+      const blob = new Blob([data], { type: 'audio/midi audio/x-midi' });
+
+      const elem = window.document.createElement('a');
+      elem.href = window.URL.createObjectURL(blob);
+      elem.download = fileName;
+      document.body.appendChild(elem);
+      elem.click();
+      document.body.removeChild(elem);
+    }
   }
 
   // Reset everything
