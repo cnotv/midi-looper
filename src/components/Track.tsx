@@ -11,11 +11,10 @@ interface TrackProps {
   record: (status: boolean) => void,
   loop: () => void,
   reset: () => void,
+  close: () => void,
 }
 
-export const Track = ({ played, record, loop, reset }: TrackProps) => {
-  const handleClose = () => { }
-
+export const Track = ({ played, record, loop, reset, close }: TrackProps) => {
   return (
     <div className="track">
       <h1>#1</h1>
@@ -34,7 +33,7 @@ export const Track = ({ played, record, loop, reset }: TrackProps) => {
           <IconReset />
         </button>
       </div>
-      <button className="close" onClick={() => handleClose()}>
+      <button className="close" onClick={() => close()}>
         <IconClose />
       </button>
     </div>

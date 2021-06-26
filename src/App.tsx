@@ -42,21 +42,22 @@ function App() {
     console.log('listenWebMidi')
     WebMidi.enable(function (err: any) {
       // Get the first real device
-      let input = WebMidi.inputs.filter((input: { manufacturer: any; }) => !!input.manufacturer)[0];
-      output = WebMidi.outputs.filter((output: { manufacturer: any; }) => !!output.manufacturer)[0];
+      let input = WebMidi.inputs.filter((x: { manufacturer: any; }) => !!x.manufacturer)[0];
+      output = WebMidi.outputs.filter((x: { manufacturer: any; }) => !!x.manufacturer)[0];
 
       if (input && info) {
-        // const { version, manufacturer, name } = input;
         const { manufacturer, name } = input;
         setInfo([manufacturer, name].join(' - '));
 
         // TODO: Create a map to retrieve length of playing time
         input.addListener('noteon', 'all', (event: InputEventNoteon) => {
           const [something, note, volume] = event.data;
+          console.log(something)
           play(note, volume, undefined)
         })
         input.addListener('noteoff', 'all', (event: InputEventNoteoff) => {
-          const [something, note, volume] = event.data;
+          const [something, note] = event.data;
+          console.log(something)
           play(note, 0, undefined)
         })
       }
@@ -171,7 +172,7 @@ function App() {
   }
 
   // Reset everything
-  const reset = () => {
+  const handleReset = () => {
     console.log('reset')
     RECORDED.length = 0;
     setPlayed('');
@@ -180,15 +181,15 @@ function App() {
     isLoop = false;
   }
 
-  // Map Inpput value to actual note
+  // Map Input value to actual note
   const inputToNote = (input: number) => {
     // TODO: Verify why 4
     const offset = 4;
     const inputOffset = input - offset;
     const size = NOTES.length;
-    const octave = Math.floor(inputOffset / size);
-    const pos = inputOffset - size * octave;
-    const note = `${NOTES[pos]}${octave}`;
+    const currentOctave = Math.floor(inputOffset / size);
+    const pos = inputOffset - size * currentOctave;
+    const note = `${NOTES[pos]}${currentOctave}`;
 
     return note;
   }
@@ -239,7 +240,7 @@ function App() {
   }
 
   // Start recording
-  const record = (status: boolean) => {
+  const handleRecord = (status: boolean) => {
     console.log('record')
     isRecording = status;
     recordingTime = performance.now();
@@ -275,13 +276,17 @@ function App() {
     })
   }
 
-  const add = () => { }
+  const handleAdd = () => {
+    // Use for add multiple tracks
+  }
 
-  const handleClose = () => { }
+  const handleClose = () => {
+    // Use for removing multiple tracks
+  }
 
-  // listenWebMidi();
-  // listenKeyboard();
-  // listenLoad();
+  listenWebMidi();
+  listenKeyboard();
+  listenLoad();
 
   return (
     <div className="App">
@@ -305,14 +310,15 @@ function App() {
         <section className="tracks">
           <Track
             played={played}
-            record={record}
+            record={handleRecord}
             loop={handleLoop}
-            reset={reset}
+            reset={handleReset}
+            close={handleClose}
           />
         </section>
       </main>
       <div className="add">
-        <button onClick={() => add()}>
+        <button onClick={handleAdd}>
           <IconAdd />
         </button>
       </div>
