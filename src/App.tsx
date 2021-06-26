@@ -15,20 +15,19 @@ function App() {
   const [info, setInfo] = useState('No recognized devices. Plug in your MIDI controller to play, otherwise use the virtual piano or your keyboards');
   const [played, setPlayed] = useState('');
   const [currentKey, setCurrentKey] = useState('');
+  // Allow to store the current note in an index, for duration computation
+  const [currentKeys, setCurrentKeys] = useState<Record<string, number>>({});
   const [loadLabel, setLoadLabel] = useState('Load midi');
 
   // const KEYBOARD = document.querySelector('#keyboard') as HTMLElement;
   const LOAD = document.querySelector('#load') as HTMLInputElement;
 
   const DEFAULT_FILE_NAME = 'my-midi';
-  const CLASS = 'keyboard__note--pressed';
   const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   const KEYMAP = ['a', 'w', 's', 'e', 'd', 'f', 't', 'g', 'y', 'h', 'u', 'j', 'k', 'o', 'l', 'p'];
   const SYNTH = new Tone.Synth().toDestination();
   const NOW = Tone.now();
 
-  // Allow to store the current note in an index, for duration computation
-  const CURRENT: Record<string, number> = {};
   const RECORDED: { time: any; volume: any; note: any, duration: any }[] = [];
 
   let isRecording = false;
@@ -40,6 +39,7 @@ function App() {
 
   // Listen external Midi IO
   const listenWebMidi = () => {
+    console.log('listenWebMidi')
     WebMidi.enable(function (err: any) {
       // Get the first real device
       let input = WebMidi.inputs.filter((input: { manufacturer: any; }) => !!input.manufacturer)[0];
@@ -47,7 +47,6 @@ function App() {
 
       if (input && info) {
         // const { version, manufacturer, name } = input;
-        // INFO.innerText = [version, manufacturer, name].join(' - ');
         const { manufacturer, name } = input;
         setInfo([manufacturer, name].join(' - '));
 
@@ -66,6 +65,7 @@ function App() {
 
   // Initialize keyboard to play from PC
   const listenKeyboard = () => {
+    console.log('listenKeyboard')
     // TODO: Verify why 8 and somewhere else 4
     const offset = 8;
 
@@ -92,6 +92,7 @@ function App() {
   }
 
   const load = () => {
+    console.log('load')
     if (!LOAD || !LOAD.files) return;
     const file = LOAD.files[0];
     if (!file) return;
@@ -129,6 +130,7 @@ function App() {
 
   // Listen input file for midi loading
   const listenLoad = () => {
+    console.log('listenLoad')
     if (!LOAD) return;
     LOAD.onchange = load;
   }
@@ -170,6 +172,7 @@ function App() {
 
   // Reset everything
   const reset = () => {
+    console.log('reset')
     RECORDED.length = 0;
     setPlayed('');
     setDisplay('');
@@ -193,20 +196,15 @@ function App() {
   // Play not from given note and volume
   // Volume default value set for PC play
   const play = (note: string | number, volume: number, duration: number | undefined) => {
+    console.log('play')
+    console.log(note, volume, duration)
     if (!display) return;
-    const key = document.querySelector(`#key${note}`);
     const tone = inputToNote(+note);
     setDisplay(note + ' - ' + tone);
-
-    // if (!CURRENT[note]) {
-    //   CURRENT[note] = performance.now();
-    // } else {
-    //   duration = Math.floor(CURRENT[note] - performance.now());
-    //   delete CURRENT[note];
-    // }
+    setCurrentKeys({ ...currentKeys, [note]: volume });
+    console.log(currentKeys)
 
     const remove = () => {
-      key?.classList?.remove(CLASS);
       SYNTH.triggerRelease(NOW + '8n')
       if (output) {
         output.stopNote(tone);
@@ -216,7 +214,6 @@ function App() {
     if (!!volume) {
       // PLay Tone.js
       SYNTH.triggerAttack(tone, NOW)
-      key?.classList?.add(CLASS);
 
       if (output) {
         // output.send([144, note, volume]);
@@ -243,12 +240,14 @@ function App() {
 
   // Start recording
   const record = (status: boolean) => {
+    console.log('record')
     isRecording = status;
     recordingTime = performance.now();
   };
 
   // Start loop
   const handleLoop = () => {
+    console.log('handleLoop')
     isLoop = !isLoop;
     isRecording = false;
     if (RECORDED.length) {
@@ -264,6 +263,7 @@ function App() {
   };
 
   const loopNotes = () => {
+    console.log('loopNotes')
     RECORDED.forEach(note => {
       setTimeout(() => {
         // Prevent to keep playing also after stop
@@ -279,10 +279,9 @@ function App() {
 
   const handleClose = () => { }
 
-  // listenMidi();
-  listenWebMidi();
-  listenKeyboard();
-  listenLoad();
+  // listenWebMidi();
+  // listenKeyboard();
+  // listenLoad();
 
   return (
     <div className="App">
@@ -298,6 +297,7 @@ function App() {
         <h3 className="title">{display}</h3>
         <Keyboard
           play={play}
+          current={currentKeys}
         />
 
         <h3 className="title">{currentKey}</h3>
