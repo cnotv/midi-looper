@@ -5,9 +5,10 @@ interface LoaderProps {
   info: string,
   label: string,
   save: () => void
+  load: () => void
 }
 
-export const Loader = ({ info, label, save }: LoaderProps) => {
+export const Loader = ({ info, label, save, load }: LoaderProps) => {
   return (
     <section>
       <p>

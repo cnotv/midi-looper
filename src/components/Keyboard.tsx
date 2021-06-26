@@ -1,5 +1,5 @@
 interface KeyboardProps {
-  play: (note: string | number, volume: number, duration: number | undefined) => void;
+  play: (note: string, volume: number, duration?: number) => void;
   current: Record<string, number>
 }
 
@@ -11,10 +11,10 @@ export const Keyboard = ({ play, current }: KeyboardProps) => {
           className={`keyboard__note ${(current[i] > 0) ? ' keyboard__note--pressed' : ''}`}
           id={`key${i}`}
           key={i}
-          onMouseDown={() => play(i, 50, undefined)}
-          onMouseUp={() => play(i, 0, undefined)}
-          onTouchStart={() => play(i, 50, undefined)}
-          onTouchEnd={() => play(i, 0, undefined)}
+          onMouseDown={() => play(`${i}`, 50)}
+          onMouseUp={() => play(`${i}`, 0)}
+          onTouchStart={() => play(`${i}`, 50)}
+          onTouchEnd={() => play(`${i}`, 0)}
         >{i}</li>
       )}
     </ul>
