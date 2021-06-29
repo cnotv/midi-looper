@@ -40,7 +40,6 @@ function App() {
     setDisplay(note + " - " + tone);
     setCurrentKeys({ ...currentKeys, [note]: volume });
     setCurrentKey(note);
-    console.log(currentKeys);
   }
 
 

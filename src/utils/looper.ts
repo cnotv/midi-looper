@@ -59,7 +59,6 @@ let output: {
 
 // Listen external Midi IO
 export const listenWebMidi = () => {
-  console.log("listenWebMidi");
   WebMidi.enable(function (err: any) {
     // Get the first real device
     let input = WebMidi.inputs.filter(
@@ -76,12 +75,10 @@ export const listenWebMidi = () => {
       // TODO: Create a map to retrieve length of playing time
       input.addListener("noteon", "all", (event: InputEventNoteon) => {
         const [something, note, volume] = event.data;
-        console.log(something);
         play(note, volume);
       });
       input.addListener("noteoff", "all", (event: InputEventNoteoff) => {
         const [something, note] = event.data;
-        console.log(something);
         play(note, 0);
       });
     }
@@ -90,7 +87,6 @@ export const listenWebMidi = () => {
 
 // Initialize keyboard to play from PC
 export const listenKeyboard = () => {
-  console.log("listenKeyboard");
   // TODO: Verify why 8 and somewhere else 4
   const offset = 8;
 
@@ -116,7 +112,6 @@ export const listenKeyboard = () => {
 };
 
 export const load = (): string => {
-  console.log("load");
   if (!LOAD || !LOAD.files) {
     return "";
   }
@@ -150,7 +145,6 @@ export const load = (): string => {
 
     RECORDED.length = 0;
     RECORDED.push(...notes);
-    console.log(JSON.stringify(notes));
   };
   reader.readAsArrayBuffer(file);
 
@@ -161,7 +155,6 @@ export const load = (): string => {
 
 // Listen input file for midi loading
 export const listenLoad = () => {
-  console.log("listenLoad");
   if (!LOAD) return;
   LOAD.onchange = load;
 };
@@ -203,7 +196,6 @@ export const save = () => {
 
 // Reset everything
 export const reset = () => {
-  console.log("reset");
   RECORDED.length = 0;
   isRecording = false;
   isLoop = false;
@@ -229,8 +221,6 @@ export const play = (
   volume: number,
   duration?: number
 ): { tone: string; recorded: string } => {
-  console.log("play");
-  console.log(note, volume, duration);
 
   // if (!display) return;
   const tone = inputToNote(+note);
@@ -275,14 +265,12 @@ export const play = (
 
 // Start recording
 export const record = (status: boolean) => {
-  console.log("record");
   isRecording = status;
   recordingTime = performance.now();
 };
 
 // Start loop
 export const loop = () => {
-  console.log("loop");
   isLoop = !isLoop;
   isRecording = false;
   if (RECORDED.length) {
@@ -298,7 +286,6 @@ export const loop = () => {
 };
 
 const loopNotes = () => {
-  console.log("loopNotes");
   RECORDED.forEach((note) => {
     setTimeout(() => {
       // Prevent to keep playing also after stop
