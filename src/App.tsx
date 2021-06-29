@@ -1,13 +1,14 @@
 
 
 import { ReactComponent as IconAdd } from './assets/img/add.svg';
+import { Midi } from "@tonejs/midi";
 
 import './App.scss';
 import { Keyboard } from './components/Keyboard';
 import { Track } from './components/Track';
 import { Loader } from './components/Loader';
-import { useState } from 'react';
-import { loop, record, reset, save, listenKeyboard, listenLoad, listenWebMidi, play, load, info, fileName } from './utils/looper';
+import { ChangeEvent, useState } from 'react';
+import { loop, record, reset, save, listenKeyboard, listenWebMidi, play, info, setRecorded, midiToNotes, notesToKeys } from './utils/looper';
 
 function App() {
   const [display, setDisplay] = useState('Input - Note');
@@ -21,15 +22,48 @@ function App() {
     // Use for add multiple tracks
   }
 
-  const handleLoad = () => {
-    setPlayed(load());
-    setLoadLabel(fileName);
+  /**
+   * Load midi from the input and display information
+   * @param event 
+   * @returns 
+   */
+  const handleLoad = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!event || !event.target.files) {
+      setPlayed('');
+      setLoadLabel('');
+      return;
+    }
+
+    const file = event.target.files[0];
+    if (!file) {
+      setPlayed('');
+      setLoadLabel('');
+      return;
+    }
+
+    setLoadLabel(file.name);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      console.log('load')
+      if (!e || !e.target || !e.target.result) return;
+      const midi = new Midi(e.target.result as ArrayBuffer);
+      const notes: RecordedNotes[] = midiToNotes(midi);
+      setPlayed(notesToKeys(notes));
+      setRecorded(notes)
+    };
+    reader.readAsArrayBuffer(file);
   }
 
   const handleClose = () => {
     // Use for removing multiple tracks
   }
 
+  /**
+   * Play notes and display information about them
+   * @param note 
+   * @param volume 
+   * @param duration 
+   */
   const handlePlay = (
     note: string,
     volume: number,
@@ -50,9 +84,10 @@ function App() {
     setDisplay('');
   }
 
+  // Listen piano keyboard device to the app
   listenWebMidi();
+  // Listen computer keyboard to be used as piano device
   listenKeyboard();
-  listenLoad();
 
   return (
     <div className="App">

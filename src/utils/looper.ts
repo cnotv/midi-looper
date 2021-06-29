@@ -2,9 +2,6 @@ import * as Tone from "tone";
 import { Midi } from "@tonejs/midi";
 import WebMidi, { InputEventNoteoff, InputEventNoteon } from "webmidi";
 
-// const KEYBOARD = document.querySelector('#keyboard') as HTMLElement;
-export const LOAD = document.querySelector("#load") as HTMLInputElement;
-
 export const DEFAULT_FILE_NAME = "my-midi";
 export const NOTES = [
   "C",
@@ -40,12 +37,18 @@ export const KEYMAP = [
 ];
 export const SYNTH = new Tone.Synth().toDestination();
 export const NOW = Tone.now();
-export let info = 'No recognized devices. Plug in your MIDI controller to play, otherwise use the virtual piano or your keyboards';
-export let fileName = '';
+export let info =
+  "No recognized devices. Plug in your MIDI controller to play, otherwise use the virtual piano or your keyboards";
+export let fileName = "";
+
 // TODO: Check why is propagating in the correct time
 export let currentKeys: Record<string, number> = {};
 
-const RECORDED: { time: any; volume: any; note: any; duration: any }[] = [];
+let recorded: RecordedNotes[] = [];
+
+export const setRecorded = (notes: RecordedNotes[]) => {
+  recorded = notes;
+};
 
 let isRecording = false;
 let isLoop = false;
@@ -70,15 +73,17 @@ export const listenWebMidi = () => {
 
     if (input && info) {
       const { manufacturer, name } = input;
-      info = ([manufacturer, name].join(" - "));
+      info = [manufacturer, name].join(" - ");
 
       // TODO: Create a map to retrieve length of playing time
       input.addListener("noteon", "all", (event: InputEventNoteon) => {
         const [something, note, volume] = event.data;
+        console.log(something);
         play(note, volume);
       });
       input.addListener("noteoff", "all", (event: InputEventNoteoff) => {
         const [something, note] = event.data;
+        console.log(something);
         play(note, 0);
       });
     }
@@ -111,58 +116,50 @@ export const listenKeyboard = () => {
   });
 };
 
-export const load = (): string => {
-  if (!LOAD || !LOAD.files) {
-    return "";
-  }
-  const file = LOAD.files[0];
-  if (!file) {
-    return "";
-  }
+/**
+ * Convert notes from midi format to internally used format
+ * @param midi 
+ * @returns 
+ */
+export const midiToNotes = (midi: Midi): RecordedNotes[] => {
+  // TODO: Replace when allow multiple loops
+  const piano = midi.tracks
+    .filter((track: { instrument: { family: string } }) =>
+      ["piano", "guitar"].includes(track.instrument.family)
+    )
+    .filter((track: { notes: string | any[] }) => track.notes.length)[0];
+  // TODO: Replace after refactoring note object to match tone.js
+  return piano.notes.map(
+    (note: { midi: any; velocity: number; ticks: any; duration: any }) => {
+      return {
+        note: note.midi,
+        volume: note.velocity * 100,
+        time: note.ticks,
+        duration: note.duration,
+      };
+    }
+  );
+};
 
-  fileName = file.name;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    if (!e || !e.target || !e.target.result) return;
-    const midi = new Midi(e.target.result as ArrayBuffer);
-    // TODO: Replace when allow multiple loops
-    const piano = midi.tracks
-      .filter((track: { instrument: { family: string } }) =>
-        ["piano", "guitar"].includes(track.instrument.family)
-      )
-      .filter((track: { notes: string | any[] }) => track.notes.length)[0];
-    // TODO: Replace after refactoring note object to match tone.js
-    const notes = piano.notes.map(
-      (n: { midi: any; velocity: number; ticks: any; duration: any }) => {
-        return {
-          note: n.midi,
-          volume: n.velocity * 100,
-          time: n.ticks,
-          duration: n.duration,
-        };
-      }
-    );
-
-    RECORDED.length = 0;
-    RECORDED.push(...notes);
-  };
-  reader.readAsArrayBuffer(file);
-
-  return RECORDED.filter((note) => !!note.volume)
+/**
+ * Retrieve list of notes from the object format
+ * @param notes 
+ * @returns 
+ */
+export const notesToKeys = (notes: RecordedNotes[]): string => {
+  return notes
+    .filter((note) => !!note.volume)
     .map((note) => inputToNote(note.note))
     .join(", ");
 };
 
-// Listen input file for midi loading
-export const listenLoad = () => {
-  if (!LOAD) return;
-  LOAD.onchange = load;
-};
-
+/**
+ * Save handler
+ */
 export const save = () => {
   const midi = new Midi();
   const track = midi.addTrack();
-  RECORDED.forEach((note) =>
+  recorded.forEach((note) =>
     track.addNote({
       midi: note.note,
       time: note.time / 1000,
@@ -196,13 +193,13 @@ export const save = () => {
 
 // Reset everything
 export const reset = () => {
-  RECORDED.length = 0;
+  recorded.length = 0;
   isRecording = false;
   isLoop = false;
 };
 
 // Map Input value to actual note
-const inputToNote = (input: number) => {
+export const inputToNote = (input: number) => {
   // TODO: Verify why 4
   const offset = 4;
   const inputOffset = input - offset;
@@ -221,11 +218,10 @@ export const play = (
   volume: number,
   duration?: number
 ): { tone: string; recorded: string } => {
-
   // if (!display) return;
   const tone = inputToNote(+note);
   currentKeys[note] = volume;
-  
+
   const remove = () => {
     SYNTH.triggerRelease(Tone.now() + "8n");
     if (output) {
@@ -252,12 +248,13 @@ export const play = (
   if (isRecording) {
     const time = Math.floor(performance.now() - recordingTime);
     // Add length
-    RECORDED.push({ note, volume, time, duration });
+    recorded.push({ note, volume, time, duration });
   }
 
   return {
     tone,
-    recorded: RECORDED.filter((x) => !!x.volume)
+    recorded: recorded
+      .filter((x) => !!x.volume)
       .map((x) => inputToNote(x.note))
       .join(", "),
   };
@@ -273,8 +270,8 @@ export const record = (status: boolean) => {
 export const loop = () => {
   isLoop = !isLoop;
   isRecording = false;
-  if (RECORDED.length) {
-    const loopLength = RECORDED[RECORDED.length - 1].time;
+  if (recorded.length) {
+    const loopLength = recorded[recorded.length - 1].time;
 
     if (isLoop) {
       loopNotes();
@@ -285,8 +282,11 @@ export const loop = () => {
   }
 };
 
+/**
+ * Loop saved notes using play capabilities
+ */
 const loopNotes = () => {
-  RECORDED.forEach((note) => {
+  recorded.forEach((note) => {
     setTimeout(() => {
       // Prevent to keep playing also after stop
       if (!isLoop) return;

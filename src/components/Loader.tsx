@@ -1,3 +1,4 @@
+import { ChangeEvent } from 'react';
 import { ReactComponent as IconLoad } from '../assets/img/load.svg';
 import { ReactComponent as IconSave } from '../assets/img/save.svg';
 
@@ -5,7 +6,7 @@ interface LoaderProps {
   info: string,
   label: string,
   save: () => void
-  load: () => void
+  load: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
 export const Loader = ({ info, label, save, load }: LoaderProps) => {
@@ -22,6 +23,7 @@ export const Loader = ({ info, label, save, load }: LoaderProps) => {
         type="file"
         name="load"
         accept="mid"
+        onChange={load}
       />
       <label htmlFor="load">
         <span>{ label }</span>
