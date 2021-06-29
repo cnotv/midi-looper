@@ -42,6 +42,8 @@ export const SYNTH = new Tone.Synth().toDestination();
 export const NOW = Tone.now();
 export let info = 'No recognized devices. Plug in your MIDI controller to play, otherwise use the virtual piano or your keyboards';
 export let fileName = '';
+// TODO: Check why is propagating in the correct time
+export let currentKeys: Record<string, number> = {};
 
 const RECORDED: { time: any; volume: any; note: any; duration: any }[] = [];
 
@@ -232,9 +234,10 @@ export const play = (
 
   // if (!display) return;
   const tone = inputToNote(+note);
-
+  currentKeys[note] = volume;
+  
   const remove = () => {
-    SYNTH.triggerRelease(NOW + "8n");
+    SYNTH.triggerRelease(Tone.now() + "8n");
     if (output) {
       output.stopNote(tone);
     }
@@ -242,7 +245,7 @@ export const play = (
 
   if (!!volume) {
     // PLay Tone.js
-    SYNTH.triggerAttack(tone, NOW);
+    SYNTH.triggerAttack(tone, Tone.now());
 
     if (output) {
       // output.send([144, note, volume]);
