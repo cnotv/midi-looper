@@ -1,7 +1,8 @@
-@import './assets/styles/global/variables.scss';
+@import "./assets/styles/global/variables.scss";
 @import url(https://fonts.googleapis.com/css?family=Lato);
 
-body, html {
+body,
+html {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -9,7 +10,7 @@ body, html {
 
 body {
   line-height: 1.7;
-  font-family: 'Lato';
+  font-family: "Lato";
   display: flex;
   flex-direction: column;
 }
@@ -33,7 +34,8 @@ body {
   font-size: 1.6rem;
 }
 
-.title, .description {
+.title,
+.description {
   background-color: $color-primary;
   color: white;
   text-align: center;
@@ -42,30 +44,30 @@ body {
 .keyboard {
   display: flex;
   justify-content: center;
-  padding: $note-width*2 $note-width $note-width;
-  height: $note-width*6;
+  padding: $note-width * 2 $note-width $note-width;
+  height: $note-width * 6;
   overflow-x: auto;
-  
+
   &__note {
     flex-shrink: 0;
-    height: $note-width*5;
+    height: $note-width * 5;
     width: $note-width;
     background-color: ivory;
     border-radius: 2px;
-    box-shadow: 0 $note-gap $note-gap  0 $color-primary;
+    box-shadow: 0 $note-gap $note-gap 0 $color-primary;
     user-select: none;
     cursor: pointer;
-    
+
     color: transparent;
-    
-    &:nth-child(12n+5),
-    &:nth-child(12n+7),
-    &:nth-child(12n+10),
-    &:nth-child(12n+12),
-    &:nth-child(12n+2) {
+
+    &:nth-child(12n + 5),
+    &:nth-child(12n + 7),
+    &:nth-child(12n + 10),
+    &:nth-child(12n + 12),
+    &:nth-child(12n + 2) {
       background-color: $color-primary;
       // position: absolute;
-      height: $note-width*3;
+      height: $note-width * 3;
       margin-left: -$note-width/2;
       margin-right: -$note-width/2;
       z-index: 1;
@@ -75,7 +77,7 @@ body {
       border-radius: 2px + $note-gap;
       box-shadow: none;
     }
-    
+
     &#{&}--active {
       margin-top: 4px;
       outline: none;
@@ -96,21 +98,19 @@ body {
   margin-bottom: 2px;
   border-radius: $button-size;
   box-shadow: 1px 1px 0 0 $color-primary;
-  
+
   &:focus {
     outline: none;
   }
-  
+
   &:active {
-    margin-left: 1px;
-    margin-top: 1px;
     box-shadow: none;
   }
 
   &--active {
     background-color: $color-accent;
   }
-  
+
   &--close {
     position: absolute;
     background-color: $color-primary;
@@ -134,12 +134,12 @@ body {
 
 .load {
   width: 0.1px;
-	height: 0.1px;
-	opacity: 0;
-	overflow: hidden;
-	position: absolute;
-	z-index: -1;
-  
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+
   + label {
     font-size: $button-size/2;
     border: 1px solid $color-primary;
@@ -150,7 +150,7 @@ body {
     cursor: pointer;
     border-radius: $button-size;
     color: $color-primary;
-    
+
     svg {
       margin-left: 0.5em;
     }

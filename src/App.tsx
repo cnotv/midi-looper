@@ -17,9 +17,18 @@ function App() {
   // Allow to store the current note in an index, for duration computation
   const [currentKeys, setCurrentKeys] = useState<Record<string, number>>({});
   const [loadLabel, setLoadLabel] = useState('Load midi');
+  // TODO: Replace string with object
+  const [tracks, setTracks] = useState<string[]>(['track']);
 
   const handleAdd = () => {
-    // Use for add multiple tracks
+    setTracks([
+      ...tracks,
+      'track'
+    ])
+  }
+
+  const handleClose = (index: number) => {
+    setTracks(tracks.filter((track, i) => i !== index))
   }
 
   /**
@@ -52,10 +61,6 @@ function App() {
       setRecorded(notes)
     };
     reader.readAsArrayBuffer(file);
-  }
-
-  const handleClose = () => {
-    // Use for removing multiple tracks
   }
 
   /**
@@ -110,20 +115,25 @@ function App() {
         <h3 className="title">{currentKey}</h3>
         <h3 className="title">Tracks</h3>
         <section className="tracks">
-          <Track
-            played={played}
-            record={record}
-            loop={loop}
-            reset={handleReset}
-            close={handleClose}
-          />
+          {tracks.map((track, i) =>
+            <Track
+              played={played}
+              record={record}
+              loop={loop}
+              reset={handleReset}
+              close={() => handleClose(i)}
+            />
+          )}
+
         </section>
+
+        <div className="add">
+          <button className="button" onClick={handleAdd}>
+            <IconAdd />
+          </button>
+        </div>
       </main>
-      <div className="add">
-        <button className="button" onClick={handleAdd}>
-          <IconAdd />
-        </button>
-      </div>
+
       <footer className="info"></footer>
     </div >
   );
