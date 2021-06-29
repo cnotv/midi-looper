@@ -4,34 +4,42 @@ import { ReactComponent as IconLoop } from '../assets/img/loop.svg';
 import { ReactComponent as IconRecord } from '../assets/img/record.svg';
 import { ReactComponent as IconReset } from '../assets/img/reset.svg';
 import { ReactComponent as IconStop } from '../assets/img/stop.svg';
+import { loop } from '../utils/looper';
 
 import './Track.scss';
 
 interface TrackProps {
-  played: string,
-  record: (status: boolean) => void,
-  loop: () => void,
-  reset: () => void,
+  track: Track,
   close: () => void,
+  update: (track: Track) => Track
 }
 
-export const Track = ({ played, record, loop, reset, close }: TrackProps) => {
-  const [recordMode, setRecordMode] = useState(false);
-  const [loopMode, setLoopMode] = useState(false);
+export const Track = ({ track, close, update }: TrackProps) => {
+  const [recordMode, setRecordMode] = useState(track.isRecording);
+  const [loopMode, setLoopMode] = useState(track.isLoop);
 
   const handleRecord = () => {
-    record(!recordMode);
-    setRecordMode(!recordMode);
+    track.isRecording = !track.isRecording;
+    setRecordMode(!recordMode)
   }
 
   const handleLoop = () => {
-    loop()
-    setLoopMode(!loopMode);
+    track.isLoop = !track.isLoop
+    setLoopMode(!loopMode)
+    loop(track)
+  }
+
+  const handleReset = () => {
+    return update({
+      notes: [],
+      isLoop: false,
+      isRecording: false
+    })
   }
 
   return (
     <div className="track">
-      <p>{ played }</p>
+      <p>{ track.notes }</p>
       <div className="track__actions">
         <button
           className={`button ${recordMode ? ' button--active' : ''}`}
@@ -49,7 +57,7 @@ export const Track = ({ played, record, loop, reset, close }: TrackProps) => {
 
         <button
           className="button"
-          onClick={reset}
+          onClick={handleReset}
         >
           <IconReset />
         </button>

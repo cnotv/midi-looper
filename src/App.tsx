@@ -8,22 +8,21 @@ import { Keyboard } from './components/Keyboard';
 import { Track } from './components/Track';
 import { Loader } from './components/Loader';
 import { ChangeEvent, useState } from 'react';
-import { loop, record, reset, save, listenKeyboard, listenWebMidi, play, info, setRecorded, midiToNotes, notesToKeys } from './utils/looper';
+import { save, listenKeyboard, listenWebMidi, play, info, midiToNotes, notesToKeys } from './utils/looper';
 
 function App() {
   const [display, setDisplay] = useState('Input - Note');
-  const [played, setPlayed] = useState('');
   const [currentKey, setCurrentKey] = useState('-');
   // Allow to store the current note in an index, for duration computation
   const [currentKeys, setCurrentKeys] = useState<Record<string, number>>({});
   const [loadLabel, setLoadLabel] = useState('Load midi');
   // TODO: Replace string with object
-  const [tracks, setTracks] = useState<string[]>(['track']);
+  const [tracks, setTracks] = useState<Track[]>([{ notes: [], isRecording: false, isLoop: false }]);
 
   const handleAdd = () => {
     setTracks([
       ...tracks,
-      'track'
+      { notes: [], isRecording: false, isLoop: false }
     ])
   }
 
@@ -38,14 +37,12 @@ function App() {
    */
   const handleLoad = (event: ChangeEvent<HTMLInputElement>) => {
     if (!event || !event.target.files) {
-      setPlayed('');
       setLoadLabel('');
       return;
     }
 
     const file = event.target.files[0];
     if (!file) {
-      setPlayed('');
       setLoadLabel('');
       return;
     }
@@ -57,8 +54,8 @@ function App() {
       if (!e || !e.target || !e.target.result) return;
       const midi = new Midi(e.target.result as ArrayBuffer);
       const notes: RecordedNotes[] = midiToNotes(midi);
-      setPlayed(notesToKeys(notes));
-      setRecorded(notes)
+      // setPlayed(notesToKeys(notes));
+      // setRecorded(notes)
     };
     reader.readAsArrayBuffer(file);
   }
@@ -75,18 +72,10 @@ function App() {
     duration?: number
   ) => {
     const { tone, recorded } = play(note, volume, duration);
-    setPlayed(recorded);
+    // setPlayed(recorded);
     setDisplay(note + " - " + tone);
     setCurrentKeys({ ...currentKeys, [note]: volume });
     setCurrentKey(note);
-  }
-
-
-  // Reset everything
-  const handleReset = () => {
-    reset();
-    setPlayed('');
-    setDisplay('');
   }
 
   // Listen piano keyboard device to the app
@@ -100,7 +89,7 @@ function App() {
         <Loader
           label={loadLabel}
           info={info}
-          save={save}
+          save={() => save(tracks)}
           load={handleLoad}
         />
       </header>
@@ -117,11 +106,10 @@ function App() {
         <section className="tracks">
           {tracks.map((track, i) =>
             <Track
-              played={played}
-              record={record}
-              loop={loop}
-              reset={handleReset}
+              key={i}
+              track={track}
               close={() => handleClose(i)}
+              update={newTrack => (track = newTrack)}
             />
           )}
 
