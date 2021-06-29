@@ -13,7 +13,7 @@ import { loop, record, reset, save, listenKeyboard, listenWebMidi, play, info, s
 function App() {
   const [display, setDisplay] = useState('Input - Note');
   const [played, setPlayed] = useState('');
-  const [currentKey, setCurrentKey] = useState('');
+  const [currentKey, setCurrentKey] = useState('-');
   // Allow to store the current note in an index, for duration computation
   const [currentKeys, setCurrentKeys] = useState<Record<string, number>>({});
   const [loadLabel, setLoadLabel] = useState('Load midi');
