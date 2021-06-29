@@ -120,7 +120,7 @@ function App() {
         </section>
       </main>
       <div className="add">
-        <button onClick={handleAdd}>
+        <button className="button" onClick={handleAdd}>
           <IconAdd />
         </button>
       </div>

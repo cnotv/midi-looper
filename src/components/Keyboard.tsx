@@ -8,7 +8,7 @@ export const Keyboard = ({ play, current }: KeyboardProps) => {
     <ul className="keyboard" id="keyboard">
       {new Array(107).fill('').map((note, i) =>
         <li
-          className={`keyboard__note ${(current[i] > 0) ? ' keyboard__note--pressed' : ''}`}
+          className={`keyboard__note ${(current[i] > 0) ? ' keyboard__note--active' : ''}`}
           id={`key${i}`}
           key={i}
           onMouseDown={() => play(`${i}`, 50)}

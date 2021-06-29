@@ -76,7 +76,7 @@ body {
       box-shadow: none;
     }
     
-    &#{&}--pressed {
+    &#{&}--active {
       margin-top: 4px;
       outline: none;
       background-color: $color-accent;
@@ -84,7 +84,7 @@ body {
   }
 }
 
-button {
+.button {
   font-size: $button-size/2;
   border: 1px solid $color-primary;
   min-width: $button-size;
@@ -106,8 +106,12 @@ button {
     margin-top: 1px;
     box-shadow: none;
   }
+
+  &--active {
+    background-color: $color-accent;
+  }
   
-  &.close {
+  &--close {
     position: absolute;
     background-color: $color-primary;
     color: ivory;

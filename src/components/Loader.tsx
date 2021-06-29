@@ -30,7 +30,7 @@ export const Loader = ({ info, label, save, load }: LoaderProps) => {
         <IconLoad />
       </label>
 
-      <button onClick={save}>
+      <button className="button" onClick={save}>
         <IconSave />
       </button>
     </section>

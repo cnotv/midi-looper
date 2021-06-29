@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ReactComponent as IconClose } from '../assets/img/close.svg';
 import { ReactComponent as IconLoop } from '../assets/img/loop.svg';
 import { ReactComponent as IconRecord } from '../assets/img/record.svg';
@@ -15,25 +16,49 @@ interface TrackProps {
 }
 
 export const Track = ({ played, record, loop, reset, close }: TrackProps) => {
+  const [recordMode, setRecordMode] = useState(false);
+  const [loopMode, setLoopMode] = useState(false);
+
+  const handleRecord = () => {
+    record(!recordMode);
+    setRecordMode(!recordMode);
+  }
+
+  const handleLoop = () => {
+    loop()
+    setLoopMode(!loopMode);
+  }
+
   return (
     <div className="track">
-      <h1>#1</h1>
       <p>{ played }</p>
       <div className="track__actions">
-        <button onClick={() => record(true)}>
-          <IconRecord />
+        <button
+          className={`button ${recordMode ? ' button--active' : ''}`}
+          onClick={handleRecord}
+        >
+          {recordMode ? <IconStop /> : <IconRecord />}
         </button>
-        <button onClick={() => record(false)}>
-          <IconStop />
-        </button>
-        <button onClick={() => loop()}>
+
+        <button
+          className={`button ${loopMode ? ' button--active' : ''}`}
+          onClick={handleLoop}
+        >
           <IconLoop />
         </button>
-        <button onClick={() => reset()}>
+
+        <button
+          className="button"
+          onClick={reset}
+        >
           <IconReset />
         </button>
       </div>
-      <button className="close" onClick={() => close()}>
+
+      <button
+        className="button button--close"
+        onClick={close}
+      >
         <IconClose />
       </button>
     </div>

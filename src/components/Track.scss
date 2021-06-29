@@ -10,5 +10,9 @@
   border-radius: 0.2em;
   box-shadow: 0.2em 0.2em 0 0 $color-primary;
   
-  &__actions {}
+  &__actions {
+    * + * {
+      margin-left: $button-size/4;
+    }
+  }
 }
