@@ -9,9 +9,9 @@ import { loop, notesToKeys } from '../utils/looper';
 import './Track.scss';
 
 interface TrackProps {
-  track: Track,
+  track: RecordedTrack,
   close: () => void,
-  update: (track: Track) => Track
+  update: (track: RecordedTrack) => RecordedTrack
 }
 
 export const Track = ({ track, close, update }: TrackProps) => {
@@ -33,6 +33,7 @@ export const Track = ({ track, close, update }: TrackProps) => {
 
   const handleReset = () => {
     return update({
+      instrument: '',
       notes: [],
       isLoop: false,
       isRecording: false
@@ -41,6 +42,7 @@ export const Track = ({ track, close, update }: TrackProps) => {
 
   return (
     <div className="track">
+      <p>{ track.instrument }</p>
       <p>{ notesToKeys(track.notes) }</p>
       <div className="track__actions">
         <button

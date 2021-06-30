@@ -138,12 +138,12 @@ export const midiToPianoSolo = (midi: Midi): RecordedNotes[] => {
  * @param midi
  * @returns
  */
-export const midiToTracks = (midi: Midi): Track[] => {
-   console.log(midi)
+export const midiToTracks = (midi: Midi): RecordedTrack[] => {
   return midi.tracks
-    .filter((track: { notes: string | any[] }) => track.notes.length)
+    .filter(track => track.notes.length)
     .map(
-      (track: { notes: any[] }) => ({
+      track => ({
+        instrument: track.instrument.name,
         isLoop: false,
         isRecording: false,
         notes: track.notes.map((note: { midi: any; velocity: number; ticks: any; duration: any }) => ({
@@ -171,7 +171,7 @@ export const notesToKeys = (notes: RecordedNotes[]): string => {
 /**
  * Save handler
  */
-export const save = (tracks: Track[]) => {
+export const save = (tracks: RecordedTrack[]) => {
   const flatNotes = tracks.reduce(
     (acc, track) => acc.concat(track.notes),
     [] as RecordedNotes[]
@@ -266,7 +266,7 @@ export const play = (
 };
 
 // Start loop
-export const loop = ({ isLoop, isRecording, notes }: Track) => {
+export const loop = ({ isLoop, isRecording, notes }: RecordedTrack) => {
   isLoop = !isLoop;
   if (notes.length) {
     const loopLength = notes[notes.length - 1].time;

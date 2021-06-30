@@ -17,13 +17,13 @@ function App() {
   const [currentKeys, setCurrentKeys] = useState<Record<string, number>>({});
   const [loadLabel, setLoadLabel] = useState('Load midi');
   // TODO: Replace string with object
-  const [tracks, setTracks] = useState<Track[]>([{ notes: [], isRecording: false, isLoop: false }]);
+  const [tracks, setTracks] = useState<RecordedTrack[]>([{ instrument: '', notes: [], isRecording: false, isLoop: false }]);
   const [currentTrack, setCurrentTrack] = useState<number>(0);
 
   const handleAdd = () => {
     setTracks([
       ...tracks,
-      { notes: [], isRecording: false, isLoop: false }
+      { instrument: '', notes: [], isRecording: false, isLoop: false }
     ])
   }
 
@@ -51,7 +51,6 @@ function App() {
     setLoadLabel(file.name);
     const reader = new FileReader();
     reader.onload = (e) => {
-      console.log('load')
       if (!e || !e.target || !e.target.result) return;
       const midi = new Midi(e.target.result as ArrayBuffer);
       setTracks([
