@@ -22,7 +22,7 @@ export const Loader = ({ info, label, save, load }: LoaderProps) => {
         id="load"
         type="file"
         name="load"
-        accept="mid"
+        accept=".mid"
         onChange={load}
       />
       <label htmlFor="load">
