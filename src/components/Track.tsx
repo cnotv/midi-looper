@@ -4,7 +4,7 @@ import { ReactComponent as IconLoop } from '../assets/img/loop.svg';
 import { ReactComponent as IconRecord } from '../assets/img/record.svg';
 import { ReactComponent as IconReset } from '../assets/img/reset.svg';
 import { ReactComponent as IconStop } from '../assets/img/stop.svg';
-import { loop } from '../utils/looper';
+import { loop, notesToKeys } from '../utils/looper';
 
 import './Track.scss';
 
@@ -41,7 +41,7 @@ export const Track = ({ track, close, update }: TrackProps) => {
 
   return (
     <div className="track">
-      <p>{ track.notes }</p>
+      <p>{ notesToKeys(track.notes) }</p>
       <div className="track__actions">
         <button
           className={`button ${recordMode ? ' button--active' : ''}`}

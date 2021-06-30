@@ -113,7 +113,7 @@ export const listenKeyboard = () => {
  * @param midi
  * @returns
  */
-export const midiToNotes = (midi: Midi): RecordedNotes[] => {
+export const midiToPianoSolo = (midi: Midi): RecordedNotes[] => {
   // TODO: Replace when allow multiple loops
   const piano = midi.tracks
     .filter((track: { instrument: { family: string } }) =>
@@ -134,6 +134,29 @@ export const midiToNotes = (midi: Midi): RecordedNotes[] => {
 };
 
 /**
+ * Convert notes from midi format to internally used format
+ * @param midi
+ * @returns
+ */
+export const midiToTracks = (midi: Midi): Track[] => {
+   console.log(midi)
+  return midi.tracks
+    .filter((track: { notes: string | any[] }) => track.notes.length)
+    .map(
+      (track: { notes: any[] }) => ({
+        isLoop: false,
+        isRecording: false,
+        notes: track.notes.map((note: { midi: any; velocity: number; ticks: any; duration: any }) => ({
+          note: note.midi,
+          volume: note.velocity * 100,
+          time: note.ticks,
+          duration: note.duration,
+        }))
+      })
+    );
+};
+
+/**
  * Retrieve list of notes from the object format
  * @param notes
  * @returns
@@ -149,11 +172,14 @@ export const notesToKeys = (notes: RecordedNotes[]): string => {
  * Save handler
  */
 export const save = (tracks: Track[]) => {
-  const flatNotes = tracks.reduce((acc, track) => acc.concat(track.notes), [] as RecordedNotes[]);
+  const flatNotes = tracks.reduce(
+    (acc, track) => acc.concat(track.notes),
+    [] as RecordedNotes[]
+  );
   const midi = new Midi();
   const midiTrack = midi.addTrack();
   flatNotes.forEach((note) =>
-  midiTrack.addNote({
+    midiTrack.addNote({
       midi: note.note,
       time: note.time / 1000,
       duration: note.time || 0.2,
@@ -203,7 +229,7 @@ export const play = (
   note: string | number,
   volume: number,
   duration?: number
-): { tone: string; recorded: string } => {
+): { tone: string; recordedNote: RecordedNotes } => {
   // if (!display) return;
   const tone = inputToNote(+note);
   currentKeys[note] = volume;
@@ -231,22 +257,11 @@ export const play = (
     remove();
   }
 
-  // if (isRecording) {
-  //   const time = Math.floor(performance.now() - recordingTime);
-  //   // Add length
-  //   recorded.push({ note, volume, time, duration });
-  // }
+  const time = Math.floor(performance.now() - recordingTime);
 
-  // return {
-  //   tone,
-  //   recorded: recorded
-  //     .filter((x) => !!x.volume)
-  //     .map((x) => inputToNote(x.note))
-  //     .join(", "),
-  // };
   return {
     tone,
-    recorded: '',
+    recordedNote: { note, volume, time, duration },
   };
 };
 
@@ -269,7 +284,7 @@ export const loop = ({ isLoop, isRecording, notes }: Track) => {
  * Loop saved notes using play capabilities
  */
 const loopNotes = (notes: RecordedNotes[], isLoop: boolean) => {
-  notes.forEach(note => {
+  notes.forEach((note) => {
     setTimeout(() => {
       // Prevent to keep playing also after stop
       if (!isLoop) return;

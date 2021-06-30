@@ -8,7 +8,7 @@ import { Keyboard } from './components/Keyboard';
 import { Track } from './components/Track';
 import { Loader } from './components/Loader';
 import { ChangeEvent, useState } from 'react';
-import { save, listenKeyboard, listenWebMidi, play, info, midiToNotes, notesToKeys } from './utils/looper';
+import { save, listenKeyboard, listenWebMidi, play, info, midiToTracks } from './utils/looper';
 
 function App() {
   const [display, setDisplay] = useState('Input - Note');
@@ -54,9 +54,10 @@ function App() {
       console.log('load')
       if (!e || !e.target || !e.target.result) return;
       const midi = new Midi(e.target.result as ArrayBuffer);
-      const notes: RecordedNotes[] = midiToNotes(midi);
-      // setPlayed(notesToKeys(notes));
-      // setRecorded(notes)
+      setTracks([
+        ...tracks.filter(track => track.notes.length > 0),
+        ...midiToTracks(midi)
+      ]);
     };
     reader.readAsArrayBuffer(file);
   }
@@ -72,8 +73,12 @@ function App() {
     volume: number,
     duration?: number
   ) => {
-    const { tone, recorded } = play(note, volume, duration);
-    // setPlayed(recorded);
+    const { tone, recordedNote } = play(note, volume, duration);
+
+    if (recordedNote.volume > 0 && tracks[currentTrack].isRecording) {
+      tracks[currentTrack].notes.push(recordedNote)
+    }
+
     setDisplay(note + " - " + tone);
     setCurrentKeys({ ...currentKeys, [note]: volume });
     setCurrentKey(note);
@@ -106,9 +111,11 @@ function App() {
         <h3 className="title">Tracks - Current: { currentTrack }</h3>
         <section className="tracks">
           {tracks.map((track, i) =>
-            <div onClick={() => setCurrentTrack(i)}>
+            <div
+              key={i}
+              onClick={() => setCurrentTrack(i)}
+            >
               <Track
-                key={i}
                 track={track}
                 close={() => handleClose(i)}
                 update={newTrack => (track = newTrack)}
