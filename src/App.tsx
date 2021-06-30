@@ -9,6 +9,11 @@ import { Loader } from './components/Loader';
 import { save, listenKeyboard, listenWebMidi, play, info, midiToTracks } from './utils/looper';
 import { newTrack } from './utils/track';
 
+// Listen piano keyboard device to the app
+listenWebMidi();
+// Listen computer keyboard to be used as piano device
+listenKeyboard();
+
 function App() {
   const [display, setDisplay] = useState('Input - Note');
   // Allow to store the current note in an index, for duration computation
@@ -87,11 +92,6 @@ function App() {
     setDisplay(note + " - " + tone);
     setCurrentKeys({ ...currentKeys, [note]: volume });
   }
-
-  // Listen piano keyboard device to the app
-  listenWebMidi();
-  // Listen computer keyboard to be used as piano device
-  listenKeyboard();
 
   return (
     <div className="App">

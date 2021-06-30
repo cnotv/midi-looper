@@ -113,31 +113,6 @@ export const listenKeyboard = () => {
  * @param midi
  * @returns
  */
-export const midiToPianoSolo = (midi: Midi): RecordedNotes[] => {
-  // TODO: Replace when allow multiple loops
-  const piano = midi.tracks
-    .filter((track: { instrument: { family: string } }) =>
-      ["piano", "guitar"].includes(track.instrument.family)
-    )
-    .filter((track: { notes: string | any[] }) => track.notes.length)[0];
-  // TODO: Replace after refactoring note object to match tone.js
-  return piano.notes.map(
-    (note: { midi: any; velocity: number; ticks: any; duration: any }) => {
-      return {
-        note: note.midi,
-        volume: note.velocity * 100,
-        time: note.ticks,
-        duration: note.duration,
-      };
-    }
-  );
-};
-
-/**
- * Convert notes from midi format to internally used format
- * @param midi
- * @returns
- */
 export const midiToTracks = (midi: Midi): RecordedTrack[] => {
   return midi.tracks
     .filter(track => track.notes.length)
