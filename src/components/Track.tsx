@@ -20,11 +20,13 @@ export const Track = ({ track, close, update }: TrackProps) => {
 
   const handleRecord = () => {
     track.isRecording = !track.isRecording;
+    setLoopMode(false)
     setRecordMode(!recordMode)
   }
 
   const handleLoop = () => {
     track.isLoop = !track.isLoop
+    setRecordMode(false)
     setLoopMode(!loopMode)
     loop(track)
   }

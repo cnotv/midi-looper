@@ -18,6 +18,7 @@ function App() {
   const [loadLabel, setLoadLabel] = useState('Load midi');
   // TODO: Replace string with object
   const [tracks, setTracks] = useState<Track[]>([{ notes: [], isRecording: false, isLoop: false }]);
+  const [currentTrack, setCurrentTrack] = useState<number>(0);
 
   const handleAdd = () => {
     setTracks([
@@ -102,15 +103,17 @@ function App() {
         />
 
         <h3 className="title">{currentKey}</h3>
-        <h3 className="title">Tracks</h3>
+        <h3 className="title">Tracks - Current: { currentTrack }</h3>
         <section className="tracks">
           {tracks.map((track, i) =>
-            <Track
-              key={i}
-              track={track}
-              close={() => handleClose(i)}
-              update={newTrack => (track = newTrack)}
-            />
+            <div onClick={() => setCurrentTrack(i)}>
+              <Track
+                key={i}
+                track={track}
+                close={() => handleClose(i)}
+                update={newTrack => (track = newTrack)}
+              />
+            </div>
           )}
 
         </section>
