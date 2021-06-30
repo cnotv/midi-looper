@@ -1,5 +1,4 @@
-
-
+import { ChangeEvent, useState } from 'react';
 import { ReactComponent as IconAdd } from './assets/img/add.svg';
 import { Midi } from "@tonejs/midi";
 
@@ -7,25 +6,32 @@ import './App.scss';
 import { Keyboard } from './components/Keyboard';
 import { Track } from './components/Track';
 import { Loader } from './components/Loader';
-import { ChangeEvent, useState } from 'react';
 import { save, listenKeyboard, listenWebMidi, play, info, midiToTracks } from './utils/looper';
+import { newTrack } from './utils/track';
 
 function App() {
   const [display, setDisplay] = useState('Input - Note');
-  const [currentKey, setCurrentKey] = useState('-');
   // Allow to store the current note in an index, for duration computation
   const [currentKeys, setCurrentKeys] = useState<Record<string, number>>({});
   const [loadLabel, setLoadLabel] = useState('Load midi');
   // TODO: Replace string with object
-  const [tracks, setTracks] = useState<RecordedTrack[]>([{ instrument: '', notes: [], isRecording: false, isLoop: false }]);
+  const [tracks, setTracks] = useState<RecordedTrack[]>([newTrack()]);
   const [currentTrack, setCurrentTrack] = useState<number>(0);
 
   const handleAdd = () => {
     setTracks([
       ...tracks,
-      { instrument: '', notes: [], isRecording: false, isLoop: false }
+      newTrack()
     ])
   }
+
+  const handleUpdate = (updatedTrack: RecordedTrack, current: number) => {
+    setTracks([
+      ...tracks.map(
+        (track, i) => (i === current ? updatedTrack : track)
+      )
+    ])
+  };
 
   const handleClose = (index: number) => {
     setTracks(tracks.filter((track, i) => i !== index))
@@ -80,7 +86,6 @@ function App() {
 
     setDisplay(note + " - " + tone);
     setCurrentKeys({ ...currentKeys, [note]: volume });
-    setCurrentKey(note);
   }
 
   // Listen piano keyboard device to the app
@@ -106,8 +111,7 @@ function App() {
           current={currentKeys}
         />
 
-        <h3 className="title">{currentKey}</h3>
-        <h3 className="title">Tracks - Current: { currentTrack }</h3>
+        <h3 className="title">Tracks {'>'} {currentTrack + 1}. {tracks[currentTrack]?.instrument}</h3>
         <section className="tracks">
           {tracks.map((track, i) =>
             <div
@@ -117,7 +121,7 @@ function App() {
               <Track
                 track={track}
                 close={() => handleClose(i)}
-                update={newTrack => (track = newTrack)}
+                update={updatedTrack => handleUpdate(updatedTrack, i)}
               />
             </div>
           )}
