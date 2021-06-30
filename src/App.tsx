@@ -120,6 +120,7 @@ function App() {
             >
               <Track
                 track={track}
+                active={currentTrack === i}
                 close={() => handleClose(i)}
                 update={updatedTrack => handleUpdate(updatedTrack, i)}
               />

@@ -11,10 +11,11 @@ import './Track.scss';
 interface TrackProps {
   track: RecordedTrack,
   close: () => void,
+  active: boolean,
   update: (track: RecordedTrack) => void
 }
 
-export const Track = ({ track, close, update }: TrackProps) => {
+export const Track = ({ track, close, active, update }: TrackProps) => {
 
   const handleRecord = () => {
     update({
@@ -39,7 +40,7 @@ export const Track = ({ track, close, update }: TrackProps) => {
   }
 
   return (
-    <div className="track">
+    <div className={`track ${active ? ' track--active' : ''}`}>
       <p>{ track.instrument }</p>
       <p>{ notesToKeys(track.notes) }</p>
       <div className="track__actions">

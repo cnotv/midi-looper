@@ -52,7 +52,7 @@ body {
     flex-shrink: 0;
     height: $note-width * 5;
     width: $note-width;
-    background-color: ivory;
+    background-color: $color-secondary;
     border-radius: 2px;
     box-shadow: 0 $note-gap $note-gap 0 $color-primary;
     user-select: none;
@@ -72,8 +72,8 @@ body {
       margin-right: -$note-width/2;
       z-index: 1;
       width: $note-width - $note-gap;
-      border-left: $note-gap solid ivory;
-      border-right: $note-gap solid ivory;
+      border-left: $note-gap solid $color-secondary;
+      border-right: $note-gap solid $color-secondary;
       border-radius: 2px + $note-gap;
       box-shadow: none;
     }
@@ -114,7 +114,7 @@ body {
   &--close {
     position: absolute;
     background-color: $color-primary;
-    color: ivory;
+    color: $color-secondary;
     right: 1em;
     top: 1em;
     font-size: $button-size/4;
