@@ -1,43 +1,41 @@
-import { useState } from 'react';
 import { ReactComponent as IconClose } from '../assets/img/close.svg';
 import { ReactComponent as IconLoop } from '../assets/img/loop.svg';
 import { ReactComponent as IconRecord } from '../assets/img/record.svg';
 import { ReactComponent as IconReset } from '../assets/img/reset.svg';
 import { ReactComponent as IconStop } from '../assets/img/stop.svg';
 import { loop, notesToKeys } from '../utils/looper';
+import { newTrack } from '../utils/track';
 
 import './Track.scss';
 
 interface TrackProps {
   track: RecordedTrack,
   close: () => void,
-  update: (track: RecordedTrack) => RecordedTrack
+  update: (track: RecordedTrack) => void
 }
 
 export const Track = ({ track, close, update }: TrackProps) => {
-  const [recordMode, setRecordMode] = useState(track.isRecording);
-  const [loopMode, setLoopMode] = useState(track.isLoop);
 
   const handleRecord = () => {
-    track.isRecording = !track.isRecording;
-    setLoopMode(false)
-    setRecordMode(!recordMode)
+    update({
+      ...track,
+      isRecording: !track.isRecording,
+      isLoop: false
+    })
   }
 
   const handleLoop = () => {
-    track.isLoop = !track.isLoop
-    setRecordMode(false)
-    setLoopMode(!loopMode)
-    loop(track)
+    loop(track);
+
+    update({
+      ...track,
+      isRecording: false,
+      isLoop: !track.isLoop
+    });
   }
 
   const handleReset = () => {
-    return update({
-      instrument: '',
-      notes: [],
-      isLoop: false,
-      isRecording: false
-    })
+    update(newTrack())
   }
 
   return (
@@ -46,14 +44,14 @@ export const Track = ({ track, close, update }: TrackProps) => {
       <p>{ notesToKeys(track.notes) }</p>
       <div className="track__actions">
         <button
-          className={`button ${recordMode ? ' button--active' : ''}`}
+          className={`button ${track.isRecording ? ' button--active' : ''}`}
           onClick={handleRecord}
         >
-          {recordMode ? <IconStop /> : <IconRecord />}
+          {track.isRecording ? <IconStop /> : <IconRecord />}
         </button>
 
         <button
-          className={`button ${loopMode ? ' button--active' : ''}`}
+          className={`button ${track.isLoop ? ' button--active' : ''}`}
           onClick={handleLoop}
         >
           <IconLoop />
