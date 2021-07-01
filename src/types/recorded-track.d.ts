@@ -1,6 +1,6 @@
 interface RecordedTrack {
   instrument: string,
-  notes: RecordedNotes[],
+  notes: RecordedNote[],
   isLoop: boolean,
   isRecording: boolean,
 }

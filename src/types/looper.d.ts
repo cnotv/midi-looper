@@ -1,4 +1,4 @@
-interface RecordedNotes {
+interface RecordedNote {
   time: any;
   volume: any;
   note: any;

@@ -6,8 +6,37 @@ import './App.scss';
 import { Keyboard } from './components/Keyboard';
 import { Track } from './components/Track';
 import { Loader } from './components/Loader';
-import { save, listenKeyboard, listenWebMidi, play, info, midiToTracks } from './utils/looper';
+import { save, listenWebMidi, play, info, midiToTracks } from './utils/looper';
 import { newTrack } from './utils/track';
+import { KEYMAP } from './config/global';
+
+// Initialize keyboard to play from PC
+export const listenKeyboard = () => {
+  let octave = 4;
+
+  // TODO: Verify why 8 and somewhere else 4
+  const offset = 8;
+
+  document.addEventListener("keydown", (event) => {
+    const { key, repeat } = event;
+    const pos = KEYMAP.indexOf(key);
+    if (pos >= 0 && !repeat) {
+      const note = pos + offset + octave * 8;
+      play(note, 50);
+    }
+  });
+
+  // TODO: Create a map to retrieve length of playing time
+  document.addEventListener("keyup", (event) => {
+    const key = event.key;
+    const pos = KEYMAP.indexOf(key);
+
+    if (pos >= 0) {
+      const note = pos + offset + octave * 8;
+      play(note, 0);
+    }
+  });
+};
 
 // Listen piano keyboard device to the app
 listenWebMidi();
@@ -21,7 +50,7 @@ function App() {
   const [loadLabel, setLoadLabel] = useState('Load midi');
   // TODO: Replace string with object
   const [tracks, setTracks] = useState<RecordedTrack[]>([newTrack()]);
-  const [currentTrack, setCurrentTrack] = useState<number>(0);
+  const [currentTrack, setCurrentTrack] = useState<number | null>(0);
 
   const handleAdd = () => {
     setTracks([
@@ -30,6 +59,11 @@ function App() {
     ])
   }
 
+  /**
+   * Update defined track by index value
+   * @param updatedTrack 
+   * @param current 
+   */
   const handleUpdate = (updatedTrack: RecordedTrack, current: number) => {
     setTracks([
       ...tracks.map(
@@ -38,7 +72,12 @@ function App() {
     ])
   };
 
+  /**
+   * Remove track from the list
+   * @param index 
+   */
   const handleClose = (index: number) => {
+    setCurrentTrack(currentTrack === index ? 0 : currentTrack)
     setTracks(tracks.filter((track, i) => i !== index))
   }
 
@@ -84,14 +123,34 @@ function App() {
     duration?: number
   ) => {
     const { tone, recordedNote } = play(note, volume, duration);
-
-    if (recordedNote.volume > 0 && tracks[currentTrack].isRecording) {
-      tracks[currentTrack].notes.push(recordedNote)
-    }
-
+    recordNote(recordedNote);
     setDisplay(note + " - " + tone);
     setCurrentKeys({ ...currentKeys, [note]: volume });
   }
+
+  /**
+   * Conditionally record new note to the existing ones
+   * @param recordedNote 
+   */
+  const recordNote = (recordedNote: RecordedNote) => {
+    if (!currentTrack) {
+      return;
+    }
+
+    const track = tracks[currentTrack];
+    if (recordedNote.volume > 0 && track.isRecording) {
+      handleUpdate({
+        ...track,
+        notes: [
+          ...track.notes,
+          recordedNote
+        ]
+      }, currentTrack)
+    }
+
+  }
+
+  const breadcrumbs = currentTrack !== null ? ` > ${currentTrack + 1}. ${tracks[currentTrack]?.instrument}` : '';
 
   return (
     <div className="App">
@@ -111,7 +170,7 @@ function App() {
           current={currentKeys}
         />
 
-        <h3 className="title">Tracks {'>'} {currentTrack + 1}. {tracks[currentTrack]?.instrument}</h3>
+        <h3 className="title">Tracks{ breadcrumbs }</h3>
         <section className="tracks">
           {tracks.map((track, i) =>
             <div
@@ -126,7 +185,6 @@ function App() {
               />
             </div>
           )}
-
         </section>
 
         <div className="add">

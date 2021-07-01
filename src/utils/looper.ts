@@ -1,40 +1,8 @@
 import * as Tone from "tone";
 import { Midi } from "@tonejs/midi";
 import WebMidi, { InputEventNoteoff, InputEventNoteon } from "webmidi";
+import { DEFAULT_FILE_NAME, NOTES } from "../config/global";
 
-export const DEFAULT_FILE_NAME = "my-midi";
-export const NOTES = [
-  "C",
-  "C#",
-  "D",
-  "D#",
-  "E",
-  "F",
-  "F#",
-  "G",
-  "G#",
-  "A",
-  "A#",
-  "B",
-];
-export const KEYMAP = [
-  "a",
-  "w",
-  "s",
-  "e",
-  "d",
-  "f",
-  "t",
-  "g",
-  "y",
-  "h",
-  "u",
-  "j",
-  "k",
-  "o",
-  "l",
-  "p",
-];
 export const SYNTH = new Tone.Synth().toDestination();
 export const NOW = Tone.now();
 export let info =
@@ -46,7 +14,6 @@ export let currentKeys: Record<string, number> = {};
 
 let recordingTime = 0;
 let theLoop: NodeJS.Timeout;
-let octave = 4;
 let output: {
   stopNote: (arg0: string) => void;
   playNote: (arg0: string) => void;
@@ -82,32 +49,6 @@ export const listenWebMidi = () => {
   });
 };
 
-// Initialize keyboard to play from PC
-export const listenKeyboard = () => {
-  // TODO: Verify why 8 and somewhere else 4
-  const offset = 8;
-
-  document.addEventListener("keydown", (event) => {
-    const { key, repeat } = event;
-    const pos = KEYMAP.indexOf(key);
-    if (pos >= 0 && !repeat) {
-      const note = pos + offset + octave * 8;
-      play(note, 50);
-    }
-  });
-
-  // TODO: Create a map to retrieve length of playing time
-  document.addEventListener("keyup", (event) => {
-    const key = event.key;
-    const pos = KEYMAP.indexOf(key);
-
-    if (pos >= 0) {
-      const note = pos + offset + octave * 8;
-      play(note, 0);
-    }
-  });
-};
-
 /**
  * Convert notes from midi format to internally used format
  * @param midi
@@ -136,7 +77,7 @@ export const midiToTracks = (midi: Midi): RecordedTrack[] => {
  * @param notes
  * @returns
  */
-export const notesToKeys = (notes: RecordedNotes[]): string => {
+export const notesToKeys = (notes: RecordedNote[]): string => {
   return notes
     .filter((note) => !!note.volume)
     .map((note) => inputToNote(note.note))
@@ -149,7 +90,7 @@ export const notesToKeys = (notes: RecordedNotes[]): string => {
 export const save = (tracks: RecordedTrack[]) => {
   const flatNotes = tracks.reduce(
     (acc, track) => acc.concat(track.notes),
-    [] as RecordedNotes[]
+    [] as RecordedNote[]
   );
   const midi = new Midi();
   const midiTrack = midi.addTrack();
@@ -204,7 +145,7 @@ export const play = (
   note: string | number,
   volume: number,
   duration?: number
-): { tone: string; recordedNote: RecordedNotes } => {
+): { tone: string; recordedNote: RecordedNote } => {
   // if (!display) return;
   const tone = inputToNote(+note);
   currentKeys[note] = volume;
@@ -258,7 +199,7 @@ export const loop = ({ isLoop, isRecording, notes }: RecordedTrack) => {
 /**
  * Loop saved notes using play capabilities
  */
-const loopNotes = (notes: RecordedNotes[], isLoop: boolean) => {
+const loopNotes = (notes: RecordedNote[], isLoop: boolean) => {
   notes.forEach((note) => {
     setTimeout(() => {
       // Prevent to keep playing also after stop
