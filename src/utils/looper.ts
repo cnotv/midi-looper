@@ -182,7 +182,7 @@ export const play = (
 };
 
 // Start loop
-export const loop = ({ isLoop, isRecording, notes }: RecordedTrack) => {
+export const loop = ({ isLoop, notes }: RecordedTrack) => {
   isLoop = !isLoop;
   if (notes.length) {
     const loopLength = notes[notes.length - 1].time;

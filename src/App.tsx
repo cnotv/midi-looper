@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { ReactComponent as IconAdd } from './assets/img/add.svg';
 import { Midi } from "@tonejs/midi";
 
@@ -10,38 +10,8 @@ import { save, listenWebMidi, play, info, midiToTracks } from './utils/looper';
 import { newTrack } from './utils/track';
 import { KEYMAP } from './config/global';
 
-// Initialize keyboard to play from PC
-export const listenKeyboard = () => {
-  let octave = 4;
-
-  // TODO: Verify why 8 and somewhere else 4
-  const offset = 8;
-
-  document.addEventListener("keydown", (event) => {
-    const { key, repeat } = event;
-    const pos = KEYMAP.indexOf(key);
-    if (pos >= 0 && !repeat) {
-      const note = pos + offset + octave * 8;
-      play(note, 50);
-    }
-  });
-
-  // TODO: Create a map to retrieve length of playing time
-  document.addEventListener("keyup", (event) => {
-    const key = event.key;
-    const pos = KEYMAP.indexOf(key);
-
-    if (pos >= 0) {
-      const note = pos + offset + octave * 8;
-      play(note, 0);
-    }
-  });
-};
-
 // Listen piano keyboard device to the app
 listenWebMidi();
-// Listen computer keyboard to be used as piano device
-listenKeyboard();
 
 function App() {
   const [display, setDisplay] = useState('Input - Note');
@@ -50,8 +20,43 @@ function App() {
   const [loadLabel, setLoadLabel] = useState('Load midi');
   // TODO: Replace string with object
   const [tracks, setTracks] = useState<RecordedTrack[]>([newTrack()]);
-  const [currentTrack, setCurrentTrack] = useState<number | null>(0);
+  const [currentTrack, setCurrentTrack] = useState<number>(0);
+  // Prevent infinite loops
+  const ref = useRef(null);
 
+  /**
+   * Listen computer keyboard to be used as piano device
+   */
+  useEffect(() => {
+    document.addEventListener("keydown", event => playKey(event, 'keydown'));
+    // TODO: Create a map to retrieve length of playing time
+    document.addEventListener("keyup", event => playKey(event, 'keyup'));
+    return () => {
+      document.removeEventListener("keydown", event => playKey(event, 'keydown'));
+      // TODO: Create a map to retrieve length of playing time
+      document.removeEventListener("keyup", event => playKey(event, 'keyup'));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ref])
+
+  const playKey = (event: KeyboardEvent, keyType: string) => {
+    const { key, repeat } = event;
+    if (repeat) {
+      return;
+    }
+
+    let octave = 4;
+    // TODO: Verify why 8 and somewhere else 4
+    const offset = 8;
+    const pos = KEYMAP.indexOf(key);
+    const volume = keyType === 'keydown' ? 50 : 0;
+
+    if (pos >= 0) {
+      const note = `${pos + offset + octave * 8}`;
+      playRecord(note, volume);
+    }
+  }
+  
   const handleAdd = () => {
     setTracks([
       ...tracks,
@@ -112,12 +117,12 @@ function App() {
   }
 
   /**
-   * Play notes and display information about them
+   * Handle side effects related to play note
    * @param note 
    * @param volume 
    * @param duration 
    */
-  const handlePlay = (
+  const playRecord = (
     note: string,
     volume: number,
     duration?: number
@@ -133,10 +138,6 @@ function App() {
    * @param recordedNote 
    */
   const recordNote = (recordedNote: RecordedNote) => {
-    if (!currentTrack) {
-      return;
-    }
-
     const track = tracks[currentTrack];
     if (recordedNote.volume > 0 && track.isRecording) {
       handleUpdate({
@@ -149,8 +150,6 @@ function App() {
     }
 
   }
-
-  const breadcrumbs = currentTrack !== null ? ` > ${currentTrack + 1}. ${tracks[currentTrack]?.instrument}` : '';
 
   return (
     <div className="App">
@@ -166,11 +165,11 @@ function App() {
       <main>
         <h3 className="title">{display}</h3>
         <Keyboard
-          play={handlePlay}
+          play={playRecord}
           current={currentKeys}
         />
 
-        <h3 className="title">Tracks{ breadcrumbs }</h3>
+        <h3 className="title">Tracks {'>'} {currentTrack + 1}. {tracks[currentTrack]?.instrument}</h3>
         <section className="tracks">
           {tracks.map((track, i) =>
             <div
