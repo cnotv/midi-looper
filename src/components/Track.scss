@@ -19,4 +19,13 @@
       margin-left: $button-size/4;
     }
   }
+
+  &__header { 
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8em;
+    position: absolute;
+    top: 0.5em;
+    width: calc(100% - 2em);
+  }
 }

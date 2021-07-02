@@ -41,8 +41,18 @@ export const Track = ({ track, close, active, update }: TrackProps) => {
 
   return (
     <div className={`track ${active ? ' track--active' : ''}`}>
-      <p>{ track.instrument }</p>
-      <p>{ notesToKeys(track.notes) }</p>
+      <header className="track__header">
+        <span>{ track.instrument }</span>
+        <button
+          className="button button--small"
+          onClick={close}
+        >
+          <IconClose />
+        </button>
+      </header>
+      
+      <p>{notesToKeys(track.notes)}</p>
+      
       <div className="track__actions">
         <button
           className={`button ${track.isRecording ? ' button--active' : ''}`}
@@ -65,13 +75,6 @@ export const Track = ({ track, close, active, update }: TrackProps) => {
           <IconReset />
         </button>
       </div>
-
-      <button
-        className="button button--close"
-        onClick={close}
-      >
-        <IconClose />
-      </button>
     </div>
   )
 };

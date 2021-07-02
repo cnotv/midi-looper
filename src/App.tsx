@@ -152,8 +152,8 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <header className="description">
+    <div className="looper">
+      <header className="looper__description">
         <Loader
           label={loadLabel}
           info={info}
@@ -163,13 +163,15 @@ function App() {
       </header>
 
       <main>
-        <h3 className="title">{display}</h3>
+        <h3 className="looper__displayed">{display}</h3>
+        
         <Keyboard
           play={playRecord}
           current={currentKeys}
         />
 
-        <h3 className="title">Tracks {'>'} {currentTrack + 1}. {tracks[currentTrack]?.instrument}</h3>
+        <div className="looper__description">Tracks {'>'} {currentTrack + 1}. {tracks[currentTrack]?.instrument}</div>
+        
         <section className="tracks">
           {tracks.map((track, i) =>
             <div
@@ -186,14 +188,15 @@ function App() {
           )}
         </section>
 
-        <div className="add">
+        <div className="looper__add">
           <button className="button" onClick={handleAdd}>
             <IconAdd />
           </button>
         </div>
       </main>
 
-      <footer className="info"></footer>
+      <footer className="looper__footer">
+      </footer>
     </div >
   );
 }

@@ -1,3 +1,5 @@
+import './Keyboard.scss';
+
 interface KeyboardProps {
   play: (note: string, volume: number, duration?: number) => void;
   current: Record<string, number>

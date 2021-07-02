@@ -1,30 +1,4 @@
-@import "./assets/styles/global/variables.scss";
-
-.looper {
-  &__description {
-    background-color: $color-primary;
-    color: white;
-    text-align: center;
-  }
-
-  &__displayed {
-    position: absolute;
-    margin: auto;
-    width: 100%;
-    text-align: center;
-  }
-
-  &__footer {
-    position: fixed;
-    bottom: 0;
-    width: 100vw;
-  }
-
-  &__add {
-    display: flex;
-    justify-content: center;
-  }
-}
+@import "../assets/styles/global/variables.scss";
 
 .keyboard {
   display: flex;
