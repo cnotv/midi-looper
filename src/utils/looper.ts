@@ -13,7 +13,6 @@ export let fileName = "";
 export let currentKeys: Record<string, number> = {};
 
 let recordingTime = 0;
-let theLoop: NodeJS.Timeout;
 let output: {
   stopNote: (arg0: string) => void;
   playNote: (arg0: string) => void;
@@ -179,34 +178,4 @@ export const play = (
     tone,
     recordedNote: { note, volume, time, duration },
   };
-};
-
-// Start loop
-export const loop = ({ isLoop, notes }: RecordedTrack) => {
-  isLoop = !isLoop;
-  if (notes.length) {
-    const loopLength = notes[notes.length - 1].time;
-
-    if (isLoop) {
-      loopNotes(notes, isLoop);
-      theLoop = setInterval(() => loopNotes(notes, isLoop), loopLength);
-    } else {
-      clearInterval(theLoop);
-    }
-  }
-};
-
-/**
- * Loop saved notes using play capabilities
- */
-const loopNotes = (notes: RecordedNote[], isLoop: boolean) => {
-  notes.forEach((note) => {
-    setTimeout(() => {
-      // Prevent to keep playing also after stop
-      if (!isLoop) return;
-
-      play(note.note, note.volume, note.duration);
-      // setTimeout(() => play(note.note, 0), 200)
-    }, note.time);
-  });
 };

@@ -3,7 +3,7 @@ import { ReactComponent as IconLoop } from '../assets/img/loop.svg';
 import { ReactComponent as IconRecord } from '../assets/img/record.svg';
 import { ReactComponent as IconReset } from '../assets/img/reset.svg';
 import { ReactComponent as IconStop } from '../assets/img/stop.svg';
-import { loop, notesToKeys } from '../utils/looper';
+import { notesToKeys } from '../utils/looper';
 import { newTrack } from '../utils/track';
 
 import './Track.scss';
@@ -26,8 +26,6 @@ export const Track = ({ track, close, active, update }: TrackProps) => {
   }
 
   const handleLoop = () => {
-    loop(track);
-
     update({
       ...track,
       isRecording: false,

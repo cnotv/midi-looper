@@ -10,6 +10,8 @@ import { save, listenWebMidi, play, info, midiToTracks } from './utils/looper';
 import { newTrack } from './utils/track';
 import { KEYMAP } from './config/global';
 
+let theLoop: NodeJS.Timeout;
+
 // Listen piano keyboard device to the app
 listenWebMidi();
 
@@ -36,7 +38,7 @@ function App() {
       // TODO: Create a map to retrieve length of playing time
       document.removeEventListener("keyup", event => playKey(event, 'keyup'));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref])
 
   const playKey = (event: KeyboardEvent, keyType: string) => {
@@ -56,7 +58,36 @@ function App() {
       playRecord(note, volume);
     }
   }
-  
+
+  // Start loop
+  const loop = ({ isLoop, notes }: RecordedTrack) => {
+    if (notes.length) {
+      const loopLength = notes[notes.length - 1].time;
+
+      if (isLoop) {
+        loopNotes(notes, isLoop);
+        theLoop = setInterval(() => loopNotes(notes, isLoop), loopLength);
+      } else {
+        clearInterval(theLoop);
+      }
+    }
+  };
+
+  /**
+   * Loop saved notes using play capabilities
+   */
+  const loopNotes = (notes: RecordedNote[], isLoop: boolean) => {
+    notes.forEach((note) => {
+      setTimeout(() => {
+        // Prevent to keep playing also after stop
+        if (!isLoop) return;
+
+        playRecord(note.note, note.volume, note.duration);
+        // setTimeout(() => play(note.note, 0), 200)
+      }, note.time);
+    });
+  };
+
   const handleAdd = () => {
     setTracks([
       ...tracks,
@@ -69,7 +100,9 @@ function App() {
    * @param updatedTrack 
    * @param current 
    */
-  const handleUpdate = (updatedTrack: RecordedTrack, current: number) => {
+  const update = (updatedTrack: RecordedTrack, current: number) => {
+      loop(updatedTrack);
+
     setTracks([
       ...tracks.map(
         (track, i) => (i === current ? updatedTrack : track)
@@ -140,7 +173,7 @@ function App() {
   const recordNote = (recordedNote: RecordedNote) => {
     const track = tracks[currentTrack];
     if (recordedNote.volume > 0 && track.isRecording) {
-      handleUpdate({
+      update({
         ...track,
         notes: [
           ...track.notes,
@@ -164,14 +197,14 @@ function App() {
 
       <main>
         <h3 className="looper__displayed">{display}</h3>
-        
+
         <Keyboard
           play={playRecord}
           current={currentKeys}
         />
 
         <div className="looper__description">Tracks {'>'} {currentTrack + 1}. {tracks[currentTrack]?.instrument}</div>
-        
+
         <section className="tracks">
           {tracks.map((track, i) =>
             <div
@@ -182,7 +215,7 @@ function App() {
                 track={track}
                 active={currentTrack === i}
                 close={() => handleClose(i)}
-                update={updatedTrack => handleUpdate(updatedTrack, i)}
+                update={updatedTrack => update(updatedTrack, i)}
               />
             </div>
           )}
