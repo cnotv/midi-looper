@@ -20,9 +20,10 @@
     width: 100vw;
   }
 
-  &__add {
+  &__actions {
     display: flex;
     justify-content: center;
+    gap: 0.5em;
   }
 }
 

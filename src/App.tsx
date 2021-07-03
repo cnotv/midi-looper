@@ -2,6 +2,10 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { ReactComponent as IconAdd } from './assets/img/add.svg';
 import { Midi } from "@tonejs/midi";
 
+import { ReactComponent as IconLoop } from './assets/img/loop.svg';
+import { ReactComponent as IconReset } from './assets/img/reset.svg';
+import { ReactComponent as IconClose } from './assets/img/close.svg';
+
 import './App.scss';
 import { Keyboard } from './components/Keyboard';
 import { Track } from './components/Track';
@@ -102,7 +106,7 @@ function App() {
    * @param current 
    */
   const update = (updatedTrack: RecordedTrack, current: number) => {
-      loop(updatedTrack);
+    loop(updatedTrack);
 
     setTracks([
       ...tracks.map(
@@ -158,6 +162,28 @@ function App() {
       ...tracks.filter(track => track.notes.length > 0),
       ...midiToTracks(SAMPLE)
     ])
+  }
+
+  const handleLoopAll = () => {
+    setTracks([
+      ...tracks.map(track => ({
+        ...track,
+        isLoop: true
+      }))
+    ])
+  }
+
+  const handleResetAll = () => {
+    setTracks([
+      ...tracks.map(track => ({
+        ...track,
+        notes: []
+      }))
+    ])
+  }
+
+  const handleDeleteAll = () => {
+    setTracks([])
   }
 
   /**
@@ -233,9 +259,27 @@ function App() {
           )}
         </section>
 
-        <div className="looper__add">
+        <div className="looper__actions">
           <button className="button" onClick={handleAdd}>
             <IconAdd />
+          </button>
+          <button
+            className={`button`}
+            onClick={handleLoopAll}
+          >
+            <IconLoop />
+          </button>
+          <button
+            className="button"
+            onClick={handleResetAll}
+          >
+            <IconReset />
+          </button>
+          <button
+            className="button"
+            onClick={handleDeleteAll}
+          >
+            <IconClose />
           </button>
         </div>
       </main>
