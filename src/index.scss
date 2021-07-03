@@ -81,12 +81,14 @@ body {
       font-size: $button-size/2;
       border: 1px solid $color-primary;
       min-width: $button-size;
-      height: $button-size;
-      padding: 0.3em 0.5em 0.3em 1em;
       background-color: $color-secondary;
       cursor: pointer;
       border-radius: $button-size;
       color: $color-primary;
+
+      display: inline-block;
+      padding: 0.45em;
+      line-height: 0;
 
       svg {
         margin-left: 0.5em;
