@@ -9,6 +9,7 @@ import { Loader } from './components/Loader';
 import { save, listenWebMidi, play, info, midiToTracks } from './utils/looper';
 import { newTrack } from './utils/track';
 import { KEYMAP } from './config/global';
+import { SAMPLE } from './config/sample';
 
 let theLoop: NodeJS.Timeout;
 
@@ -150,6 +151,16 @@ function App() {
   }
 
   /**
+   * Load sample Midi song
+   */
+  const handleSample = () => {
+    setTracks([
+      ...tracks.filter(track => track.notes.length > 0),
+      ...midiToTracks(SAMPLE)
+    ])
+  }
+
+  /**
    * Handle side effects related to play note
    * @param note 
    * @param volume 
@@ -192,6 +203,7 @@ function App() {
           info={info}
           save={() => save(tracks)}
           load={handleLoad}
+          loadSample={handleSample}
         />
       </header>
 
