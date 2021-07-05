@@ -1,0 +1,10 @@
+@mixin textButton {
+  // font-size: 0.8em;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
+}
+
+@mixin banner {
+  background-color: $color-primary;
+  color: white;
+}

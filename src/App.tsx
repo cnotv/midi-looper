@@ -5,6 +5,8 @@ import { Midi } from "@tonejs/midi";
 import { ReactComponent as IconLoop } from './assets/img/loop.svg';
 import { ReactComponent as IconReset } from './assets/img/reset.svg';
 import { ReactComponent as IconClose } from './assets/img/close.svg';
+import { ReactComponent as IconLoad } from './assets/img/load.svg';
+import { ReactComponent as IconSave } from './assets/img/save.svg';
 
 import './App.scss';
 import { Keyboard } from './components/Keyboard';
@@ -223,41 +225,33 @@ function App() {
 
   return (
     <div className="looper">
-      <header className="looper__description">
-        <Loader
-          label={loadLabel}
-          info={info}
-          save={() => save(tracks)}
-          load={handleLoad}
-          loadSample={handleSample}
-        />
-      </header>
+      <header className="looper__header">
+        <div>
+          <button
+            className="button button--text"
+            onClick={handleSample}
+          >Load sample</button>
 
-      <main>
-        <h3 className="looper__displayed">{display}</h3>
+          <input
+            className="input input--load"
+            id="load"
+            type="file"
+            name="load"
+            accept=".mid"
+            onChange={handleLoad}
+          />
+          <label htmlFor="load">
+            <span>{loadLabel}</span>
+            <IconLoad />
+          </label>
 
-        <Keyboard
-          play={playRecord}
-          current={currentKeys}
-        />
-
-        <div className="looper__description">Tracks {'>'} {currentTrack + 1}. {tracks[currentTrack]?.instrument}</div>
-
-        <section className="tracks">
-          {tracks.map((track, i) =>
-            <div
-              key={i}
-              onClick={() => setCurrentTrack(i)}
-            >
-              <Track
-                track={track}
-                active={currentTrack === i}
-                close={() => handleClose(i)}
-                update={updatedTrack => update(updatedTrack, i)}
-              />
-            </div>
-          )}
-        </section>
+          <button
+            className="button"
+            onClick={() => save}
+          >
+            <IconSave />
+          </button>
+        </div>
 
         <div className="looper__actions">
           <button className="button" onClick={handleAdd}>
@@ -282,9 +276,39 @@ function App() {
             <IconClose />
           </button>
         </div>
+      </header>
+
+      <main>
+        <h3 className="looper__displayed">{display}</h3>
+
+        <Keyboard
+          play={playRecord}
+          current={currentKeys}
+        />
+
+        <div className="looper__breadcrumbs">Tracks {'>'} {currentTrack + 1}. {tracks[currentTrack]?.instrument}</div>
+
+        <section className="tracks">
+          {tracks.map((track, i) =>
+            <div
+              key={i}
+              onClick={() => setCurrentTrack(i)}
+            >
+              <Track
+                track={track}
+                active={currentTrack === i}
+                close={() => handleClose(i)}
+                update={updatedTrack => update(updatedTrack, i)}
+              />
+            </div>
+          )}
+        </section>
       </main>
 
       <footer className="looper__footer">
+        <Loader
+          info={info}
+        />
       </footer>
     </div >
   );

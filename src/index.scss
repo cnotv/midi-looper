@@ -1,4 +1,5 @@
 @import "./assets/styles/global/variables.scss";
+@import "./assets/styles/global/mixins.scss";
 @import url(https://fonts.googleapis.com/css?family=Lato);
 
 body,
@@ -64,6 +65,7 @@ body {
   }
 
   &--text {
+    @include textButton();
     width: auto;
   }
 }

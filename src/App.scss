@@ -1,10 +1,17 @@
 @import "./assets/styles/global/variables.scss";
+@import "./assets/styles/global/mixins.scss";
 
 .looper {
-  &__description {
-    background-color: $color-primary;
-    color: white;
-    text-align: center;
+  position: relative;
+
+  &__header {
+    @include banner();
+    position: sticky;
+    display: flex;
+    padding: 0.2em;
+    top: 0;
+    justify-content: space-between;
+    z-index: 2;
   }
 
   &__displayed {
@@ -25,6 +32,11 @@
     justify-content: center;
     gap: 0.5em;
   }
+
+  &__breadcrumbs {
+    @include banner();
+    text-align: center;
+  }
 }
 
 .keyboard {
@@ -43,14 +55,13 @@
     box-shadow: 0 $note-gap $note-gap 0 $color-primary;
     user-select: none;
     cursor: pointer;
-
     color: transparent;
 
+    &:nth-child(12n + 2),
     &:nth-child(12n + 5),
     &:nth-child(12n + 7),
     &:nth-child(12n + 10),
-    &:nth-child(12n + 12),
-    &:nth-child(12n + 2) {
+    &:nth-child(12n + 12) {
       background-color: $color-primary;
       // position: absolute;
       height: $note-width * 3;
