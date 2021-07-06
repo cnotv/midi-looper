@@ -1,10 +1,30 @@
 @mixin textButton {
-  // font-size: 0.8em;
-  padding-left: 0.8em;
-  padding-right: 0.8em;
+  @include media-bp(desktop) {
+    padding-left: 0.8em;
+    padding-right: 0.8em;
+  }
+  box-shadow: 1px 1px 0 0 $color-primary;
+
+  &:active {
+    box-shadow: none;
+  }
 }
 
 @mixin banner {
-  background-color: $color-primary;
-  color: white;
+  background-color: $color-secondary;
+  border: 1px solid $color-primary;
+  border-bottom-width: 0.15em;
+}
+
+// Creating viewports mixin
+@mixin media-bp($prefix) {
+  @if map-get($viewports, $prefix) {
+    $media-query: map-get($viewports, $prefix);
+
+    @media #{$media-query} {
+      @content;
+    }
+  } @else {
+    @warn 'please define a real device';
+  }
 }

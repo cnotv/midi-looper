@@ -22,9 +22,9 @@
   }
 
   &__footer {
-    position: fixed;
     bottom: 0;
     width: 100vw;
+    font-size: 0.8em;
   }
 
   &__actions {
@@ -36,49 +36,5 @@
   &__breadcrumbs {
     @include banner();
     text-align: center;
-  }
-}
-
-.keyboard {
-  display: flex;
-  justify-content: center;
-  padding: $note-width * 2 $note-width $note-width;
-  height: $note-width * 6;
-  overflow-x: auto;
-
-  &__note {
-    flex-shrink: 0;
-    height: $note-width * 5;
-    width: $note-width;
-    background-color: $color-secondary;
-    border-radius: 2px;
-    box-shadow: 0 $note-gap $note-gap 0 $color-primary;
-    user-select: none;
-    cursor: pointer;
-    color: transparent;
-
-    &:nth-child(12n + 2),
-    &:nth-child(12n + 5),
-    &:nth-child(12n + 7),
-    &:nth-child(12n + 10),
-    &:nth-child(12n + 12) {
-      background-color: $color-primary;
-      // position: absolute;
-      height: $note-width * 3;
-      margin-left: -$note-width/2;
-      margin-right: -$note-width/2;
-      z-index: 1;
-      width: $note-width - $note-gap;
-      border-left: $note-gap solid $color-secondary;
-      border-right: $note-gap solid $color-secondary;
-      border-radius: 2px + $note-gap;
-      box-shadow: none;
-    }
-
-    &#{&}--active {
-      margin-top: 4px;
-      outline: none;
-      background-color: $color-accent;
-    }
   }
 }

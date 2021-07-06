@@ -9,10 +9,12 @@ import { ReactComponent as IconLoad } from './assets/img/load.svg';
 import { ReactComponent as IconSave } from './assets/img/save.svg';
 
 import './App.scss';
+
+import { save, listenWebMidi, play, info, midiToTracks } from './utils/looper';
+
 import { Keyboard } from './components/Keyboard';
 import { Track } from './components/Track';
 import { Loader } from './components/Loader';
-import { save, listenWebMidi, play, info, midiToTracks } from './utils/looper';
 import { newTrack } from './utils/track';
 import { KEYMAP } from './config/global';
 import { SAMPLE } from './config/sample';
@@ -226,7 +228,7 @@ function App() {
   return (
     <div className="looper">
       <header className="looper__header">
-        <div>
+        <div className="looper__actions">
           <button
             className="button button--text"
             onClick={handleSample}
@@ -241,38 +243,43 @@ function App() {
             onChange={handleLoad}
           />
           <label htmlFor="load">
-            <span>{loadLabel}</span>
+            <span className="button__label">{loadLabel}</span>
             <IconLoad />
           </label>
 
           <button
-            className="button"
+            className="button button--text"
             onClick={() => save}
           >
+            <span className="button__label">Save song</span>
             <IconSave />
           </button>
         </div>
 
         <div className="looper__actions">
-          <button className="button" onClick={handleAdd}>
+          <button className="button button--text" onClick={handleAdd}>
+            <span className="button__label">Add Track</span>
             <IconAdd />
           </button>
           <button
-            className={`button`}
+            className="button button--text"
             onClick={handleLoopAll}
           >
+            <span className="button__label">Loop All</span>
             <IconLoop />
           </button>
           <button
-            className="button"
+            className="button button--text"
             onClick={handleResetAll}
           >
+            <span className="button__label">Reset All</span>
             <IconReset />
           </button>
           <button
-            className="button"
+            className="button button--text"
             onClick={handleDeleteAll}
           >
+            <span className="button__label">Delete All</span>
             <IconClose />
           </button>
         </div>
