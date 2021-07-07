@@ -1,3 +1,4 @@
+import { inputToNote } from '../utils/looper';
 import './Keyboard.scss';
 
 interface KeyboardProps {
@@ -7,12 +8,16 @@ interface KeyboardProps {
 
 export const Keyboard = ({ play, current }: KeyboardProps) => {
   const isTouch = window.navigator.maxTouchPoints > 0;
+  
+  const getActiveClass = (i: number): string => {
+    return (current[i] > 0) ? ' keyboard__note--active' : '';
+  }
 
   return (
     <ul className="keyboard" id="keyboard">
       {new Array(107).fill('').map((note, i) =>
         <li
-          className={`keyboard__note ${(current[i] > 0) ? ' keyboard__note--active' : ''}`}
+          className={`keyboard__note ${getActiveClass(i)}`}
           id={`key${i}`}
           key={i}
           onMouseDown={() => !isTouch ? play(`${i}`, 50) : undefined}
@@ -20,7 +25,7 @@ export const Keyboard = ({ play, current }: KeyboardProps) => {
           onMouseLeave={() => !isTouch ? play(`${i}`, 0) : undefined}
           onTouchStart={() => play(`${i}`, 50)}
           onTouchEnd={() => play(`${i}`, 0)}
-        >{i}</li>
+        >{inputToNote(i)}</li>
       )}
     </ul>
   )

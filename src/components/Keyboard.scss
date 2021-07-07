@@ -16,9 +16,13 @@
     box-shadow: 0 $note-gap $note-gap 0 $color-primary;
     user-select: none;
     cursor: pointer;
-
-    color: transparent;
-
+    list-style: none;
+    
+    font-size: 0.7em;
+    // font-weight: 700;
+    line-height: $note-width * 9;
+    text-align: center;
+    
     &:nth-child(12n + 5),
     &:nth-child(12n + 7),
     &:nth-child(12n + 10),
@@ -35,6 +39,8 @@
       border-right: $note-gap solid $color-secondary;
       border-radius: 2px + $note-gap;
       box-shadow: none;
+      line-height: $note-width * 5;
+      color: white;
     }
 
     &#{&}--active {
