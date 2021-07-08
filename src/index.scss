@@ -23,11 +23,11 @@ body {
   }
 
   &::-webkit-scrollbar-track {
-    background-color: $color-accent;
-  }
-
-  &::-webkit-scrollbar-thumb {
     background-color: $color-primary;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: $color-accent;
   }
 }
 

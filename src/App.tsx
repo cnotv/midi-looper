@@ -227,7 +227,16 @@ function App() {
 
   return (
     <div className="looper">
-      <header className="looper__header">
+
+      <main>
+        <h3 className="looper__displayed">{display}</h3>
+
+        <Keyboard
+          play={playRecord}
+          current={currentKeys}
+        />
+
+<header className="looper__header">
         <div className="looper__actions">
           <button
             className="button button--text"
@@ -283,18 +292,8 @@ function App() {
             <IconClose />
           </button>
         </div>
-      </header>
-
-      <main>
-        <h3 className="looper__displayed">{display}</h3>
-
-        <Keyboard
-          play={playRecord}
-          current={currentKeys}
-        />
-
-        <div className="looper__breadcrumbs">Tracks {'>'} {currentTrack + 1}. {tracks[currentTrack]?.instrument}</div>
-
+        </header>
+        
         <section className="tracks">
           {tracks.map((track, i) =>
             <div

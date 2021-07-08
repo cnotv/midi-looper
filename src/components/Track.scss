@@ -6,9 +6,9 @@
   flex-direction: column;
   // width: 200px;
   padding: 1em;
-  margin: 0.5em;
+  margin: 1.5em;
   border-radius: 0.2em;
-  box-shadow: 0.2em 0.2em 0 0 $color-primary;
+  box-shadow: 0.4em 0.4em 0 0 $color-primary;
   
   &--active {
     background-color: $color-secondary;
