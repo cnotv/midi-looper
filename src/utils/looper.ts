@@ -2,6 +2,7 @@ import * as Tone from "tone";
 import { Midi } from "@tonejs/midi";
 import WebMidi, { InputEventNoteoff, InputEventNoteon } from "webmidi";
 import { DEFAULT_FILE_NAME, NOTES } from "../config/global";
+import { newTrack } from "./track";
 
 export const SYNTH = new Tone.Synth().toDestination();
 export const NOW = Tone.now();
@@ -58,15 +59,14 @@ export const midiToTracks = (midi: Midi): RecordedTrack[] => {
     .filter(track => track.notes.length)
     .map(
       track => ({
+        ...newTrack(),
         instrument: track.instrument.name,
-        isLoop: false,
-        isRecording: false,
         notes: track.notes.map((note: { midi: any; velocity: number; ticks: any; duration: any }) => ({
           note: note.midi,
           volume: note.velocity * 100,
           time: note.ticks,
           duration: note.duration,
-        }))
+        })),
       })
     );
 };
@@ -126,7 +126,7 @@ export const save = (tracks: RecordedTrack[]) => {
 };
 
 // Map Input value to actual note
-export const inputToNote = (input: number) => {
+export const inputToNote = (input: number): string => {
   // TODO: Verify why 4
   const offset = 4;
   const inputOffset = input - offset;
