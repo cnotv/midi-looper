@@ -3,8 +3,8 @@ import { ReactComponent as IconLoop } from '../assets/img/loop.svg';
 import { ReactComponent as IconRecord } from '../assets/img/record.svg';
 import { ReactComponent as IconReset } from '../assets/img/reset.svg';
 import { ReactComponent as IconStop } from '../assets/img/stop.svg';
-import { notesToKeys } from '../utils/looper';
-import { newTrack } from '../utils/track';
+import { notesToKeys } from '../utils/Looper';
+import { newTrack } from '../utils/Track';
 
 import './Track.scss';
 

@@ -10,12 +10,12 @@ import { ReactComponent as IconSave } from './assets/img/save.svg';
 
 import './App.scss';
 
-import { save, listenWebMidi, play, info, midiToTracks } from './utils/looper';
+import { save, listenWebMidi, play, info, midiToTracks } from './utils/Looper';
 
 import { Keyboard } from './components/Keyboard';
 import { Track } from './components/Track';
 import { Loader } from './components/Loader';
-import { newTrack } from './utils/track';
+import { newTrack } from './utils/Track';
 import { KEYMAP } from './config/global';
 import { SAMPLE } from './config/sample';
 
@@ -222,7 +222,6 @@ function App() {
         ]
       }, currentTrack)
     }
-
   }
 
   return (
@@ -236,64 +235,64 @@ function App() {
           current={currentKeys}
         />
 
-<header className="looper__header">
-        <div className="looper__actions">
-          <button
-            className="button button--text"
-            onClick={handleSample}
-          >Load sample</button>
+        <header className="looper__header">
+          <div className="looper__actions">
+            <button
+              className="button button--text"
+              onClick={handleSample}
+            >Load sample</button>
 
-          <input
-            className="input input--load"
-            id="load"
-            type="file"
-            name="load"
-            accept=".mid"
-            onChange={handleLoad}
-          />
-          <label htmlFor="load">
-            <span className="button__label">{loadLabel}</span>
-            <IconLoad />
-          </label>
+            <input
+              className="input input--load"
+              id="load"
+              type="file"
+              name="load"
+              accept=".mid"
+              onChange={handleLoad}
+            />
+            <label htmlFor="load">
+              <span className="button__label">{loadLabel}</span>
+              <IconLoad />
+            </label>
 
-          <button
-            className="button button--text"
-            onClick={() => save}
-          >
-            <span className="button__label">Save song</span>
-            <IconSave />
-          </button>
-        </div>
+            <button
+              className="button button--text"
+              onClick={() => save}
+            >
+              <span className="button__label">Save song</span>
+              <IconSave />
+            </button>
+          </div>
 
-        <div className="looper__actions">
-          <button className="button button--text" onClick={handleAdd}>
-            <span className="button__label">Add Track</span>
-            <IconAdd />
-          </button>
-          <button
-            className="button button--text"
-            onClick={handleLoopAll}
-          >
-            <span className="button__label">Loop All</span>
-            <IconLoop />
-          </button>
-          <button
-            className="button button--text"
-            onClick={handleResetAll}
-          >
-            <span className="button__label">Reset All</span>
-            <IconReset />
-          </button>
-          <button
-            className="button button--text"
-            onClick={handleDeleteAll}
-          >
-            <span className="button__label">Delete All</span>
-            <IconClose />
-          </button>
-        </div>
+          <div className="looper__actions">
+            <button className="button button--text" onClick={handleAdd}>
+              <span className="button__label">Add Track</span>
+              <IconAdd />
+            </button>
+            <button
+              className="button button--text"
+              onClick={handleLoopAll}
+            >
+              <span className="button__label">Loop All</span>
+              <IconLoop />
+            </button>
+            <button
+              className="button button--text"
+              onClick={handleResetAll}
+            >
+              <span className="button__label">Reset All</span>
+              <IconReset />
+            </button>
+            <button
+              className="button button--text"
+              onClick={handleDeleteAll}
+            >
+              <span className="button__label">Delete All</span>
+              <IconClose />
+            </button>
+          </div>
         </header>
-        
+
         <section className="tracks">
           {tracks.map((track, i) =>
             <div

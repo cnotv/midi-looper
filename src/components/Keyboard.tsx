@@ -1,4 +1,4 @@
-import { inputToNote } from '../utils/looper';
+import { inputToNote } from '../utils/Looper';
 import './Keyboard.scss';
 
 interface KeyboardProps {

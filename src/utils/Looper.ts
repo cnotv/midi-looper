@@ -2,7 +2,7 @@ import * as Tone from "tone";
 import { Midi } from "@tonejs/midi";
 import WebMidi, { InputEventNoteoff, InputEventNoteon } from "webmidi";
 import { DEFAULT_FILE_NAME, NOTES } from "../config/global";
-import { newTrack } from "./track";
+import { newTrack } from "./Track";
 
 export const SYNTH = new Tone.Synth().toDestination();
 export const NOW = Tone.now();
