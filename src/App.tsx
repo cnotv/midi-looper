@@ -172,7 +172,8 @@ function App() {
     setTracks([
       ...tracks.map(track => ({
         ...track,
-        isLoop: true
+        isLoop: true,
+        isRecording: false
       }))
     ])
   }
