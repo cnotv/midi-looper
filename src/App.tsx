@@ -91,6 +91,8 @@ function App() {
     });
   };
 
+
+
   /**
    * Update defined track by index value
    * @param updatedTrack 
@@ -98,11 +100,15 @@ function App() {
    */
   const update = (updatedTrack: RecordedTrack, current: number) => {
     loop(updatedTrack);
-
+    const recordingOff = (track: RecordedTrack) => ({
+      ...track,
+      isRecording: false,
+    })
+    
     setTracks([
-      ...tracks.map(
-        (track, i) => (i === current ? updatedTrack : track)
-      )
+      ...tracks.filter((track, i) => i < current).map(recordingOff),
+      updatedTrack,
+      ...tracks.filter((track, i) => i > current).map(recordingOff),
     ])
   };
 
