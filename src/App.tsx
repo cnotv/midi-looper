@@ -1,12 +1,5 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { ReactComponent as IconAdd } from './assets/img/add.svg';
 import { Midi } from "@tonejs/midi";
-
-import { ReactComponent as IconLoop } from './assets/img/loop.svg';
-import { ReactComponent as IconReset } from './assets/img/reset.svg';
-import { ReactComponent as IconClose } from './assets/img/close.svg';
-import { ReactComponent as IconLoad } from './assets/img/load.svg';
-import { ReactComponent as IconSave } from './assets/img/save.svg';
 
 import './App.scss';
 
@@ -18,6 +11,7 @@ import { Loader } from './components/Loader';
 import { newTrack } from './utils/Track';
 import { KEYMAP } from './config/global';
 import { SAMPLE } from './config/sample';
+import { Actions } from './components/Actions';
 
 let theLoop: NodeJS.Timeout;
 
@@ -97,13 +91,6 @@ function App() {
     });
   };
 
-  const handleAdd = () => {
-    setTracks([
-      ...tracks,
-      newTrack()
-    ])
-  }
-
   /**
    * Update defined track by index value
    * @param updatedTrack 
@@ -158,17 +145,24 @@ function App() {
     reader.readAsArrayBuffer(file);
   }
 
+  const add = () => {
+    setTracks([
+      ...tracks,
+      newTrack()
+    ])
+  }
+
   /**
    * Load sample Midi song
    */
-  const handleSample = () => {
+  const sample = () => {
     setTracks([
       ...tracks.filter(track => track.notes.length > 0),
       ...midiToTracks(SAMPLE)
     ])
   }
 
-  const handleLoopAll = () => {
+  const loopAll = () => {
     setTracks([
       ...tracks.map(track => ({
         ...track,
@@ -177,7 +171,7 @@ function App() {
     ])
   }
 
-  const handleResetAll = () => {
+  const resetAll = () => {
     setTracks([
       ...tracks.map(track => ({
         ...track,
@@ -186,8 +180,33 @@ function App() {
     ])
   }
 
-  const handleDeleteAll = () => {
+  const deleteAll = () => {
     setTracks([])
+  }
+
+  const handleAction = (type: ActionType) => {
+    switch (type) {
+      case "sample":
+        sample()
+        break;
+      case "save":
+        save(tracks)
+        break;
+      case "add":
+        add()
+        break;
+      case "loopAll":
+        loopAll()
+        break;
+      case "resetAll":
+        resetAll()
+        break;
+      case "deleteAll":
+        deleteAll()
+        break;
+      default:
+        break;
+    }
   }
 
   /**
@@ -226,7 +245,6 @@ function App() {
 
   return (
     <div className="looper">
-
       <main>
         <h3 className="looper__displayed">{display}</h3>
 
@@ -236,61 +254,11 @@ function App() {
         />
 
         <header className="looper__header">
-          <div className="looper__actions">
-            <button
-              className="button button--text"
-              onClick={handleSample}
-            >Load sample</button>
-
-            <input
-              className="input input--load"
-              id="load"
-              type="file"
-              name="load"
-              accept=".mid"
-              onChange={handleLoad}
-            />
-            <label htmlFor="load">
-              <span className="button__label">{loadLabel}</span>
-              <IconLoad />
-            </label>
-
-            <button
-              className="button button--text"
-              onClick={() => save}
-            >
-              <span className="button__label">Save song</span>
-              <IconSave />
-            </button>
-          </div>
-
-          <div className="looper__actions">
-            <button className="button button--text" onClick={handleAdd}>
-              <span className="button__label">Add Track</span>
-              <IconAdd />
-            </button>
-            <button
-              className="button button--text"
-              onClick={handleLoopAll}
-            >
-              <span className="button__label">Loop All</span>
-              <IconLoop />
-            </button>
-            <button
-              className="button button--text"
-              onClick={handleResetAll}
-            >
-              <span className="button__label">Reset All</span>
-              <IconReset />
-            </button>
-            <button
-              className="button button--text"
-              onClick={handleDeleteAll}
-            >
-              <span className="button__label">Delete All</span>
-              <IconClose />
-            </button>
-          </div>
+          <Actions
+            action={handleAction}
+            load={handleLoad}
+            label={loadLabel}
+          ></Actions>
         </header>
 
         <section className="tracks">

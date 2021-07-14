@@ -4,17 +4,6 @@
 .looper {
   position: relative;
 
-  &__header {
-    background-color: $color-secondary;
-    border: 1px solid $color-primary;
-    border-bottom-width: 0.15em;    position: sticky;
-    display: flex;
-    padding: 0.2em;
-    top: 0;
-    justify-content: space-between;
-    z-index: 2;
-  }
-
   &__displayed {
     position: absolute;
     margin: auto;
@@ -22,15 +11,21 @@
     text-align: center;
   }
 
+  &__header {
+    background-color: $color-secondary;
+    border: 1px solid $color-primary;
+    border-bottom-width: 0.15em;
+    position: sticky;
+    display: flex;
+    padding: 0.2em;
+    top: 0;
+    justify-content: space-between;
+    z-index: 2;
+  }
+
   &__footer {
     bottom: 0;
     width: 100vw;
     font-size: 0.8em;
-  }
-
-  &__actions {
-    display: flex;
-    justify-content: center;
-    gap: 0.5em;
   }
 }

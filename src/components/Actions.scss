@@ -1,0 +1,8 @@
+@import "./../assets/styles/global/variables.scss";
+@import "./../assets/styles/global/mixins.scss";
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5em;
+}
