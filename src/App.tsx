@@ -260,13 +260,13 @@ function App() {
           current={currentKeys}
         />
 
-        <header className="looper__header">
+        <div className="looper__actions">
           <Actions
             action={handleAction}
             load={handleLoad}
             label={loadLabel}
           ></Actions>
-        </header>
+        </div>
 
         <section className="tracks">
           {tracks.map((track, i) =>
@@ -285,7 +285,7 @@ function App() {
         </section>
       </main>
 
-      <footer className="looper__footer">
+      <footer className="looper__info">
         <Loader
           info={info}
         />

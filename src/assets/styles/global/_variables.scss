@@ -1,0 +1,27 @@
+// Defining viewports
+$viewports: (
+  phone:        "only screen and (max-width: 575px)",
+  mobile:       "only screen and (max-width: 991px)",
+  tablet:       "only screen and (min-width: 575px) and (max-width: 992px)",
+  tablet-min:   "only screen and (min-width: 575px)",
+  desktop:      "only screen and (min-width: 992px)",
+);
+
+:root {
+  --color-primary:                      black;
+  --color-secondary:                    ivory;
+  --color-accent:                       orange;
+  --color-bg:                           white;
+}
+
+// Colors
+$color-primary:     var(--color-primary);
+$color-secondary:   var(--color-secondary);
+$color-accent:      var(--color-accent);
+$color-bg:          var(--color-bg);
+$color-border:      var(--color-primary);
+
+// Spaces
+$note-width: 26px;
+$note-gap: 2px;
+$button-size: 2em;

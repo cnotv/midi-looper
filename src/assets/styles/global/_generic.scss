@@ -1,0 +1,90 @@
+body {
+  line-height: 1.7;
+  font-family: "Lato";
+  display: flex;
+  flex-direction: column;
+  background-color: $color-bg;
+}
+
+.button {
+  font-size: $button-size/2;
+  border: 1px solid $color-primary;
+  min-width: $button-size;
+  width: $button-size;
+  height: $button-size;
+  padding: 0.45em;
+  background-color: $color-secondary;
+  cursor: pointer;
+  margin-bottom: 2px;
+  border-radius: $button-size;
+  box-shadow: 1px 1px 0 0 $color-primary;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    box-shadow: none;
+  }
+
+  &--active {
+    background-color: $color-accent;
+  }
+
+  &--small {
+    background-color: $color-primary;
+    color: $color-secondary;
+    right: 1em;
+    top: 1em;
+    font-size: $button-size/4;
+  }
+
+  &__label {
+    @include media-bp(mobile) {
+      display: none;
+    }
+  }
+
+  &--text {
+    @include textButton();
+    width: auto;
+
+    svg {
+      @include media-bp(desktop) {
+        margin-left: 0.5em;
+      }
+    }
+  }
+}
+
+.input {
+  &--load {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+
+    + label {
+      font-size: $button-size/2;
+      border: 1px solid $color-primary;
+      background-color: $color-secondary;
+      cursor: pointer;
+      border-radius: $button-size;
+      color: $color-primary;
+      height: 0.95em;
+      @include textButton();
+
+      display: inline-block;
+      padding: 0.45em;
+      line-height: 0;
+
+      svg {
+        @include media-bp(desktop) {
+          margin-left: 0.5em;
+        }
+      }
+    }
+  }
+}
