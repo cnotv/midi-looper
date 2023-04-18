@@ -6,7 +6,8 @@
   padding: $note-width * 2 $note-width $note-width;
   height: $note-width * 6;
   overflow-x: auto;
-
+  gap: 2px;
+  
   &__note {
     flex-shrink: 0;
     height: $note-width * 5;
@@ -35,8 +36,6 @@
       margin-right: -$note-width/2;
       z-index: 1;
       width: $note-width - $note-gap;
-      border-left: $note-gap solid $color-secondary;
-      border-right: $note-gap solid $color-secondary;
       border-radius: 2px + $note-gap;
       box-shadow: none;
       line-height: $note-width * 5;
