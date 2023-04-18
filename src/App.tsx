@@ -9,7 +9,7 @@ import { Keyboard } from './components/Keyboard';
 import { Track } from './components/Track';
 import { Loader } from './components/Loader';
 import { newTrack } from './utils/Track';
-import { KEYMAP } from './config/global';
+import { KEYS_MAP } from './config/global';
 import { SAMPLE } from './config/sample';
 import { Actions } from './components/Actions';
 
@@ -53,7 +53,7 @@ function App() {
     let octave = 4;
     // TODO: Verify why 8 and somewhere else 4
     const offset = 8;
-    const pos = KEYMAP.indexOf(key);
+    const pos = KEYS_MAP.indexOf(key);
     const volume = keyType === 'keydown' ? 50 : 0;
 
     if (pos >= 0) {

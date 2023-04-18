@@ -13,7 +13,7 @@ export const NOTES = [
   "A#",
   "B",
 ];
-export const KEYMAP = [
+export const KEYS_MAP = [
   "a",
   "w",
   "s",

@@ -1,5 +1,14 @@
 @import "../assets/styles/global/variables.scss";
 
+.keyboard-actions {
+  display: flex;
+  justify-content: right;
+  grid-gap: 0.5em;
+  gap: 0.5em;
+  z-index: 1;
+  position: relative;
+}
+
 .keyboard {
   display: flex;
   justify-content: center;
@@ -9,6 +18,12 @@
   gap: 2px;
   
   &__note {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-direction: column;
+    padding-bottom: 4px;
+
     flex-shrink: 0;
     height: $note-width * 5;
     width: $note-width;
@@ -20,9 +35,8 @@
     list-style: none;
     
     font-size: 0.7em;
-    // font-weight: 700;
-    line-height: $note-width * 9;
-    text-align: center;
+    // font-weight: 700; */
+    line-height: 1.2;
     
     &:nth-child(12n + 5),
     &:nth-child(12n + 7),
@@ -38,7 +52,6 @@
       width: $note-width - $note-gap;
       border-radius: 2px + $note-gap;
       box-shadow: none;
-      line-height: $note-width * 5;
       color: white;
     }
 

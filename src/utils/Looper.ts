@@ -128,7 +128,7 @@ export const save = (tracks: RecordedTrack[]) => {
 // Map Input value to actual note
 export const inputToNote = (input: number): string => {
   // TODO: Verify why 4
-  const offset = 4;
+  const offset = 3;
   const inputOffset = input - offset;
   const size = NOTES.length;
   const currentOctave = Math.floor(inputOffset / size);
