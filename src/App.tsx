@@ -50,14 +50,14 @@ function App() {
       return;
     }
 
-    let octave = 4;
+    let octave = 3;
     // TODO: Verify why 8 and somewhere else 4
-    const offset = 8;
+    const offset = 3;
     const pos = KEYS_MAP.indexOf(key);
     const volume = keyType === 'keydown' ? 50 : 0;
 
     if (pos >= 0) {
-      const note = `${pos + offset + octave * 8}`;
+      const note = `${pos + offset + octave * 12}`;
       playRecord(note, volume);
     }
   }
