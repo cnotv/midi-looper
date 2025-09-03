@@ -84,7 +84,7 @@ function App() {
       setTimeout(() => {
         // Prevent to keep playing also after stop
         if (!isLoop) return;
-
+        console.log(note)
         playRecord(note.note, note.volume, note.duration);
         // setTimeout(() => play(note.note, 0), 200)
       }, note.time);
@@ -99,6 +99,7 @@ function App() {
    * @param current 
    */
   const update = (updatedTrack: RecordedTrack, current: number) => {
+    console.log('loop?')
     loop(updatedTrack);
     const recordingOff = (track: RecordedTrack) => ({
       ...track,

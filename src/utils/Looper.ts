@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 import { Midi } from "@tonejs/midi";
-import WebMidi, { InputEventNoteoff, InputEventNoteon } from "webmidi";
+import { WebMidi } from "webmidi";
 import { DEFAULT_FILE_NAME, NOTES } from "../config/global";
 import { newTrack } from "./Track";
 
@@ -14,39 +14,40 @@ export let fileName = "";
 export let currentKeys: Record<string, number> = {};
 
 let recordingTime = 0;
-let output: {
-  stopNote: (arg0: string) => void;
-  playNote: (arg0: string) => void;
-};
+let output: any;
 
 // Listen external Midi IO
 export const listenWebMidi = () => {
-  WebMidi.enable(function (err: any) {
-    // Get the first real device
-    let input = WebMidi.inputs.filter(
-      (x: { manufacturer: any }) => !!x.manufacturer
-    )[0];
-    output = WebMidi.outputs.filter(
-      (x: { manufacturer: any }) => !!x.manufacturer
-    )[0];
+  WebMidi.enable()
+    .then(() => {
+      // Get the first real device
+      let input = WebMidi.inputs.filter(
+        (x: { manufacturer: any }) => !!x.manufacturer
+      )[0];
+      output = WebMidi.outputs.filter(
+        (x: { manufacturer: any }) => !!x.manufacturer
+      )[0];
 
-    if (input && info) {
-      const { manufacturer, name } = input;
-      info = [manufacturer, name].join(" - ");
+      if (input && info) {
+        const { manufacturer, name } = input;
+        info = [manufacturer, name].join(" - ");
 
-      // TODO: Create a map to retrieve length of playing time
-      input.addListener("noteon", "all", (event: InputEventNoteon) => {
-        const [something, note, volume] = event.data;
-        console.log(something);
-        play(note, volume);
-      });
-      input.addListener("noteoff", "all", (event: InputEventNoteoff) => {
-        const [something, note] = event.data;
-        console.log(something);
-        play(note, 0);
-      });
-    }
-  });
+        // TODO: Create a map to retrieve length of playing time
+        input.addListener("noteon", (event: any) => {
+          const note = event.note.number;
+          const volume = Math.floor(event.velocity * 127);
+          play(note, volume);
+        });
+        
+        input.addListener("noteoff", (event: any) => {
+          const note = event.note.number;
+          play(note, 0);
+        });
+      }
+    })
+    .catch((err: any) => {
+      console.error("WebMidi could not be enabled:", err);
+    });
 };
 
 /**
@@ -152,7 +153,7 @@ export const play = (
   const remove = () => {
     SYNTH.triggerRelease(Tone.now() + "8n");
     if (output) {
-      output.stopNote(tone);
+      output.sendNoteOff(tone);
     }
   };
 
@@ -162,7 +163,7 @@ export const play = (
 
     if (output) {
       // output.send([144, note, volume]);
-      output.playNote(tone);
+      output.sendNoteOn(tone, volume / 127);
     }
 
     if (duration) {
